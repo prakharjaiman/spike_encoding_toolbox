@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import scipy as sc
 from scipy.signal import butter, lfilter, welch, square  # for signal filtering
 from utilis import *
-from args_emg import args as my_args
+from args import args as my_args
 
 def encode(args):
     # general stuff
@@ -141,8 +141,7 @@ def encode(args):
     file_path = "dataset/"
     file_name = args.encoded_data_file_prefix + str(args.dataset) + str(args.encode_thr_up) + str(
         args.encode_thr_dn) + str(args.encode_refractory) + str(args.encode_interpfact)+ str(args.fold) + ".npz"
-    # np.savez(file_path, X=X, Y=Y,X=X,Y=Y,spike_times_up = spike_times_up ,spike_times_dn = spike_times_dn,spike_times_up = spike_times_up ,spike_times_dn = spike_times_dn)
-    # np.savez('/home/turing/Desktop/EMG/EMG_dataset_with_spike_time.npz', X=X, Y=Y,X=X,Y=Y,spike_times_up = spike_times_up ,spike_times_dn = spike_times_dn,spike_times_up = spike_times_up ,spike_times_dn = spike_times_dn)
+
     np.savez_compressed(
         file_path + file_name,
         X_Train=X_Train,

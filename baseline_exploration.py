@@ -32,22 +32,22 @@ if __name__ == '__main__':
                          })
 
 	parameters = dict(
-		dataset = [ '5_class','roshambo']
+		dataset = [ 'bci3']
 		,threshold = [0.5]
 		,interpfact = [5]
 		,refractory = [1]
-		, fold=[1,2,3]
+		# , fold=[1,2,3]
     )
 	param_values = [v for v in parameters.values()]
 
-	for args.dataset,threshold,interpfact,refractory,fold in product(*param_values):
+	for args.dataset,threshold,interpfact,refractory in product(*param_values):
 
 		args.encode_thr_up = threshold
 		args.encode_thr_dn = threshold
 		args.encode_refractory = refractory
 		args.encode_interpfact = interpfact
 		args.fold=fold
-		args.experiment_name = str(args.dataset)+str(threshold)+str(interpfact)+str(refractory)+str(fold)
+		args.experiment_name = str(args.dataset)+str(threshold)+str(interpfact)+str(refractory)
 
 		svm_score, firing_rate, svm_score_baseline = evaluate_encoder(args)
 		df = df.append({ "dataset":args.dataset,

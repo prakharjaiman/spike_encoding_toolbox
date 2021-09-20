@@ -15,7 +15,7 @@ def args():
 
     # Defining the model
     parser.add_argument(
-        "--dataset", default="roshambo", type=str, help="Dataset(roshambo or 5_class)"
+        "--dataset", default="bci3", type=str, help="Dataset(BCI3)"
     )
     parser.add_argument(
         "--encode_thr_up",
@@ -44,10 +44,11 @@ def args():
 
     parser.add_argument(
         "--encoded_data_file_prefix",
-        default='encoded-emg',
+        default='encoded-ecog',
         type=str,
-        help="Interpolation factor in ms for spike encoding" "e.g. 1, 2, 3, etc.",
+        help="",
     )
+    
 
     
     parser.add_argument(
@@ -67,7 +68,7 @@ def args():
 
     parser.add_argument(
         "--tlast",
-        default=1800,
+        default=3000,
         type=float,
         help="Time point till which the simulated sub-segment(of length tstep) is used as a feature for readout layer" "e.g. <1800> (in ms).",
     )
@@ -94,9 +95,6 @@ def args():
     parser.add_argument('--fold', default=3, type=float,
                         help='Fold for train/test'
                              'e.g. 1, 2, 3 ')
-    
-    parser.add_argument('--classes_dict', default=["rock", "paper", "scissor"], 
-                        help='Name of classes')
 
 
     parser.add_argument('--log_file_path', default=None, 

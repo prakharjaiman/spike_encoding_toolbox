@@ -37,7 +37,7 @@ def args():
     )
     parser.add_argument(
         "--encode_interpfact",
-        default=5,
+        default=1,
         type=float,
         help="Interpolation factor in ms for spike encoding" "e.g. 1, 2, 3, etc.",
     )

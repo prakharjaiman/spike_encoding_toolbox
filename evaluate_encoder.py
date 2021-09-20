@@ -19,7 +19,7 @@ import gc
 import matplotlib.pyplot as plt
 import time
 from utilis import *
-from args_emg import args as my_args
+from args import args as my_args
 from encode import *
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -37,7 +37,7 @@ def evaluate_encoder(args):
     np.random.seed(seed)
     print(args.__dict__)
 
-    spike_times_train_up, spike_times_train_dn, spike_times_test_up, spike_times_test_dn, X_EMG_Train,X_EMG_Test, Y_EMG_Train,Y_EMG_Test,avg_spike_rate = encode(args)
+    spike_times_train_up, spike_times_train_dn, spike_times_test_up, spike_times_test_dn, X_Train,X_Test, Y_Train,Y_Test,avg_spike_rate = encode(args)
 
     nbtimepoints = int(args.duration / args.tstep)
 
@@ -47,7 +47,7 @@ def evaluate_encoder(args):
     #Training
     spike_times_up = spike_times_train_up
     spike_times_dn = spike_times_train_dn
-    labels = Y_EMG_Train
+    labels = Y_Train
     label_list = []
 
     for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
@@ -72,7 +72,7 @@ def evaluate_encoder(args):
     # Testing
     spike_times_up = spike_times_test_up
     spike_times_dn = spike_times_test_dn
-    labels = Y_EMG_Test
+    labels = Y_Test
     label_list = []
 
     for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
@@ -96,12 +96,12 @@ def evaluate_encoder(args):
     print(len(X_input_test))
 
 
-    X_EMG_Train_segmented, Y_EMG_Train_segmented = segment(X_EMG_Train, Y_EMG_Train,tstep= 40, tstart=0, tstop=400)
-    X_EMG_Test_segmented, Y_EMG_Test_segmented = segment(X_EMG_Test, Y_EMG_Test, tstep=40, tstart=0, tstop=400)
-    X_train = np.mean(X_EMG_Train_segmented, axis=1)
-    X_test = np.mean(X_EMG_Test_segmented, axis=1)
-    Y_train = Y_EMG_Train_segmented
-    Y_test = Y_EMG_Test_segmented
+    X_Train_segmented, Y_Train_segmented = segment(X_Train, Y_Train,tstep= 40, tstart=0, tstop=400)
+    X_Test_segmented, Y_Test_segmented = segment(X_Test, Y_Test, tstep=40, tstart=0, tstop=400)
+    X_train = np.mean(X_Train_segmented, axis=1)
+    X_test = np.mean(X_Test_segmented, axis=1)
+    Y_train = Y_Train_segmented
+    Y_test = Y_Test_segmented
 
 
     '''
@@ -157,7 +157,7 @@ def evaluate_encoder(args):
     np.savez_compressed(
         'spike_data.npz',
         X=np.array(X_input_test),
-        Y_EMG_Train=np.array(Y_input_test)
+        Y_Train=np.array(Y_input_test)
     )
 
 

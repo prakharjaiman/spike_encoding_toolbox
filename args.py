@@ -19,13 +19,13 @@ def args():
     )
     parser.add_argument(
         "--encode_thr_up",
-        default=0.5,
+        default=5,
         type=float,
         help="Threshold UP for spike encoding" "e.g. 0.25, 0.50 etc.",
     )
     parser.add_argument(
         "--encode_thr_dn",
-        default=0.5,
+        default=5,
         type=float,
         help="Threshold UP for spike encoding" "e.g. 0.25, 0.50 etc.",
     )
@@ -53,7 +53,7 @@ def args():
     
     parser.add_argument(
         "--tstep",
-        default=200,
+        default=500,
         type=float,
         help="Readout layer step time in ms" "e.g. 200, 300, etc etc.",
     )

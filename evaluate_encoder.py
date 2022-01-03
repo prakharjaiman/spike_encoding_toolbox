@@ -56,7 +56,7 @@ def evaluate_encoder(args):
         times, indices = convert_data_add_format(sample_time_up, sample_time_down)
         rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
                                                          time_array=np.array(times),
-                                                         duration=3000, tstep=200, nbneurons=nbInputs)
+                                                         duration=3000, tstep=args.tstep, nbneurons=nbInputs)
 
         spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
         label_list.append(np.array(labels[iteration]))
@@ -83,7 +83,7 @@ def evaluate_encoder(args):
 
         rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
                                                                time_array=np.array(times),
-                                                               duration=3000, tstep=200, nbneurons=nbInputs)
+                                                               duration=3000, tstep=args.tstep, nbneurons=nbInputs)
 
         spike_rate_array_all_input_test = np.dstack((spike_rate_array_all_input_test, rate_array_input))
         label_list.append(np.array(labels[iteration]))
@@ -98,8 +98,8 @@ def evaluate_encoder(args):
     print(len(X_input_test))
 
 
-    X_Train_segmented, Y_Train_segmented = segment(X_Train, Y_Train,tstep= 200, tstart=0, tstop=3000)
-    X_Test_segmented, Y_Test_segmented = segment(X_Test, Y_Test, tstep=200, tstart=0, tstop=3000)
+    X_Train_segmented, Y_Train_segmented = segment(X_Train, Y_Train,tstep= args.tstep, tstart=0, tstop=3000)
+    X_Test_segmented, Y_Test_segmented = segment(X_Test, Y_Test, tstep=args.tstep, tstart=0, tstop=3000)
     X_train = np.mean(X_Train_segmented, axis=1)
     X_test = np.mean(X_Test_segmented, axis=1)
     Y_train = Y_Train_segmented

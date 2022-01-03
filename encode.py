@@ -5,15 +5,15 @@
 # Spike time array contains values of spike times in ms.
 # Saved arrays :
 
-# X: Array of the EMG Digital time series data with length = 300
-# Y: Array of the labels of theing data with length = 300
+# X: Array of the EMG/EEG/ECoG Digital time series data with length = 200
+# Y: Array of the labels of theing data with length = 200
 
-# spike_times_up: Spike time arrays with upward polarity in ms for X. length = 300
-# spike_times_dn: Spike time arrays with downward polarity in ms for X. length = 300
+# spike_times_up: Spike time arrays with upward polarity in ms for X. length = 200
+# spike_times_dn: Spike time arrays with downward polarity in ms for X. length = 200
 
 # Author : Nikhil Garg, 3IT Sherbrooke ; nikhilgarg.bits@gmail.com
 # Created : 15 July 2020
-# Last edited : 12th September 2020
+# Last edited : 3rd January 2022
 
 import os
 import numpy as np
@@ -31,7 +31,7 @@ def encode(args):
     pwd = os. getcwd()
 
     if args.dataset == "bci3":
-        data_dir = pwd + "/dataset/bci3/bci3epochs.npz"
+        data_dir = pwd + "\\dataset\\bci_3.npz"
         fs = 1000
         nb_channels = 64
         
@@ -47,14 +47,15 @@ def encode(args):
 
     data = np.load(data_dir)
     X_Train = data['X']
-    Y_Train = data['y']
+    Y_Train = data['events']
 
-    X_Test = data['X_test']
-    Y_Test = data['y_test']
+    X_Test = data['X']
+    Y_Test = data['events']
 
 
 
     X_Train = np.array(X_Train)
+
     X_Train = np.moveaxis(X_Train, 2, 1)
     Y_Train = np.array(Y_Train)
 
@@ -72,8 +73,8 @@ def encode(args):
     print("Number of training samples in dataset:")
     print(len(X_Train))
     print(len(Y_Train))
-    print("Class labels:")
-    print(list(set(Y_Train)))
+    # print("Class labels:")
+    # print(list(set(Y_Train)))
 
     # Take session 0,1 as and session 2 as test.
 
@@ -135,8 +136,8 @@ def encode(args):
     print("Number of test samples in dataset:")
     print(len(X_Test))
     print(len(Y_Test))
-    print("Class labels:")
-    print(list(set(Y_Test)))
+    # print("Class labels:")
+    # print(list(set(Y_Test)))
 
 
     spike_times_train_up = np.array(spike_times_train_up)

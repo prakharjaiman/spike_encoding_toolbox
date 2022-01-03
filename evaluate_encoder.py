@@ -31,7 +31,7 @@ from sklearn.model_selection import cross_val_predict
 
 def evaluate_encoder(args):
 
-    nbInputs = 16
+    nbInputs = 64
     seed = 500
     random.seed(seed)
     np.random.seed(seed)
@@ -44,6 +44,7 @@ def evaluate_encoder(args):
     spike_rate_array_all_input_train = np.ones((nbInputs, nbtimepoints)) * -1  # Dummy spike counts. Would be discarded in last lines
     spike_rate_array_all_input_test = np.ones((nbInputs, nbtimepoints)) * -1
 
+
     #Training
     spike_times_up = spike_times_train_up
     spike_times_dn = spike_times_train_dn
@@ -55,7 +56,7 @@ def evaluate_encoder(args):
         times, indices = convert_data_add_format(sample_time_up, sample_time_down)
         rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
                                                          time_array=np.array(times),
-                                                         duration=2000, tstep=200, nbneurons=nbInputs)
+                                                         duration=3000, tstep=200, nbneurons=nbInputs)
 
         spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
         label_list.append(np.array(labels[iteration]))
@@ -74,14 +75,15 @@ def evaluate_encoder(args):
     spike_times_dn = spike_times_test_dn
     labels = Y_Test
     label_list = []
-
+    #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
     for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
+        #TODO: do a TQDM progress bar here
         print(iteration)
         times, indices = convert_data_add_format(sample_time_up, sample_time_down)
 
         rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
                                                                time_array=np.array(times),
-                                                               duration=2000, tstep=200, nbneurons=nbInputs)
+                                                               duration=3000, tstep=200, nbneurons=nbInputs)
 
         spike_rate_array_all_input_test = np.dstack((spike_rate_array_all_input_test, rate_array_input))
         label_list.append(np.array(labels[iteration]))
@@ -96,8 +98,8 @@ def evaluate_encoder(args):
     print(len(X_input_test))
 
 
-    X_Train_segmented, Y_Train_segmented = segment(X_Train, Y_Train,tstep= 40, tstart=0, tstop=400)
-    X_Test_segmented, Y_Test_segmented = segment(X_Test, Y_Test, tstep=40, tstart=0, tstop=400)
+    X_Train_segmented, Y_Train_segmented = segment(X_Train, Y_Train,tstep= 200, tstart=0, tstop=3000)
+    X_Test_segmented, Y_Test_segmented = segment(X_Test, Y_Test, tstep=200, tstart=0, tstop=3000)
     X_train = np.mean(X_Train_segmented, axis=1)
     X_test = np.mean(X_Test_segmented, axis=1)
     Y_train = Y_Train_segmented
@@ -116,7 +118,7 @@ def evaluate_encoder(args):
 
 
     pwd = os.getcwd()
-    plot_dir = pwd + '/plots/'
+    plot_dir = pwd + '\\plots\\'
     plt.rcParams.update({'font.size': 16})
     #Confusion matrix
     predictions = clf_input.predict(X_input_test)

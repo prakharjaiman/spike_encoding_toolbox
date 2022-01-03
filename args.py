@@ -10,7 +10,7 @@ import argparse
 
 def args():
     parser = argparse.ArgumentParser(
-        description="Train a reservoir based SNN on EMG data"
+        description="Train a reservoir based SNN on biosignals"
     )
 
     # Defining the model
@@ -44,7 +44,7 @@ def args():
 
     parser.add_argument(
         "--encoded_data_file_prefix",
-        default='encoded-ecog',
+        default='bci3_encoded',
         type=str,
         help="",
     )
@@ -74,7 +74,7 @@ def args():
     )
     parser.add_argument(
         "--duration",
-        default=2000,
+        default=3000,
         type=float,
         help="Time point till which the simulation has to be run",
     )

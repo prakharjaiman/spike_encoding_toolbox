@@ -6,9 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-from evaluate_reservoir import *
+#from evaluate_reservoir import *
 from utilis import *
-from args_emg import args as my_args
+from args import args as my_args
 from evaluate_encoder import  *
 from itertools import product
 import time
@@ -28,36 +28,41 @@ if __name__ == '__main__':
 						"encode_interpfact":[],
                         "firing_rate":[],
                         "svm_score":[],
+                        "rf_score":[],
                         "svm_score_baseline":[]
                          })
 
 	parameters = dict(
 		dataset = [ 'bci3']
-		,threshold = [0.5]
-		,interpfact = [5]
+		,threshold_up = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    ,threshold_dn = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+		,interpfact = [1]
 		,refractory = [1]
+    #,tstep=[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
 		# , fold=[1,2,3]
     )
 	param_values = [v for v in parameters.values()]
 
-	for args.dataset,threshold,interpfact,refractory in product(*param_values):
+	for args.dataset,threshold_up,threshold_dn, interpfact,refractory in product(*param_values):
 
-		args.encode_thr_up = threshold
-		args.encode_thr_dn = threshold
+		args.encode_thr_up = threshold_up
+		args.encode_thr_dn = threshold_dn
 		args.encode_refractory = refractory
 		args.encode_interpfact = interpfact
-		args.fold=fold
-		args.experiment_name = str(args.dataset)+str(threshold)+str(interpfact)+str(refractory)
+    #args.tstep = tstep
+		args.experiment_name = str(args.dataset)+str(threshold_up)+str(threshold_dn)+str(interpfact)+str(refractory)
 
-		svm_score, firing_rate, svm_score_baseline = evaluate_encoder(args)
+		svm_score, rf_score, firing_rate, svm_score_baseline = evaluate_encoder(args)
 		df = df.append({ "dataset":args.dataset,
 						 "fold":args.fold,
 						 "encode_thr_up":args.encode_thr_up,
 						 "encode_thr_dn":args.encode_thr_dn,
 						 "encode_refractory": args.encode_refractory,
 						 "encode_interpfact": args.encode_interpfact,
+             "tstep": args.tstep,
 		                 "firing_rate":firing_rate,
 		                 "svm_score":svm_score,
+                     "rf_score":rf_score,
 		                 "svm_score_baseline":svm_score_baseline
 		                 },ignore_index=True)
 

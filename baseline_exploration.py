@@ -34,8 +34,8 @@ if __name__ == '__main__':
 
 	parameters = dict(
 		dataset = [ 'bci3']
-		,threshold_up = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    ,threshold_dn = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+		,encode_thr_up = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    ,encode_thr_dn = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 		,interpfact = [1]
 		,refractory = [1]
     #,tstep=[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
@@ -43,14 +43,11 @@ if __name__ == '__main__':
     )
 	param_values = [v for v in parameters.values()]
 
-	for args.dataset,threshold_up,threshold_dn, interpfact,refractory in product(*param_values):
+	for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.encode_interpfact,args.encode_refractory in product(*param_values):
 
-		args.encode_thr_up = threshold_up
-		args.encode_thr_dn = threshold_dn
-		args.encode_refractory = refractory
-		args.encode_interpfact = interpfact
+
     #args.tstep = tstep
-		args.experiment_name = str(args.dataset)+str(threshold_up)+str(threshold_dn)+str(interpfact)+str(refractory)
+		args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
 
 		svm_score, rf_score, firing_rate, svm_score_baseline = evaluate_encoder(args)
 		df = df.append({ "dataset":args.dataset,

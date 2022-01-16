@@ -28,6 +28,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import scikitplot as skplt
 from sklearn.model_selection import cross_val_predict
+from sklearn.ensemble import RandomForestClassifier 
+from sklearn.feature_selection import RFE,SelectFromModel
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
 
 def evaluate_encoder(args):
 
@@ -99,7 +103,12 @@ def evaluate_encoder(args):
 
 
     X_Train_segmented, Y_Train_segmented = segment(X_Train, Y_Train,tstep= args.tstep, tstart=0, tstop=args.tlast)
+    print(len(X_Train_segmented))
+    X_Train_segmented=np.array(X_Train_segmented)
+    Y_Train_segmented=np.array(Y_Train_segmented)
     X_Test_segmented, Y_Test_segmented = segment(X_Test, Y_Test, tstep=args.tstep, tstart=0, tstop=args.tlast)
+    X_Test_segmented=np.array(X_Test_segmented)
+    Y_Test_segmented=np.array(Y_Test_segmented)
     X_train = np.mean(X_Train_segmented, axis=1)
     X_test = np.mean(X_Test_segmented, axis=1)
     Y_train = Y_Train_segmented
@@ -111,14 +120,21 @@ def evaluate_encoder(args):
     '''
 
     clf_input = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
+    #print("X CLF" + str(X_input_train.shape))
+    #print("Y CLF" + str(Y_input_train.shape))
     clf_input.fit(X_input_train, Y_input_train)
     svm_score_input = clf_input.score(X_input_test, Y_input_test)
     print("Input test accuraccy")
     print(svm_score_input)
 
+    rf_w = RandomForestClassifier(n_estimators=300)
+    rf_w.fit(X_input_train, Y_input_train)
+    y_pred_rf_w = rf_w.predict(X_input_test)
+    rf_score_input=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
+
 
     pwd = os.getcwd()
-    plot_dir = pwd + '\\plots\\'
+    plot_dir = pwd + '/plots/'
     plt.rcParams.update({'font.size': 16})
     #Confusion matrix
     predictions = clf_input.predict(X_input_test)
@@ -152,10 +168,10 @@ def evaluate_encoder(args):
     plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'roc'+'.svg')
     plt.clf()
     
+     
 
-
-    plot_dataset(X=X_test,y=Y_test,fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_raw_test',args=args)
-    plot_dataset(X=np.array(X_input_test),y=np.array(Y_input_test),fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_decoded_test',args=args)
+    #plot_dataset(X=X_test,y=Y_test,fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_raw_test',args=args)
+    #plot_dataset(X=np.array(X_input_test),y=np.array(Y_input_test),fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_decoded_test',args=args)
     np.savez_compressed(
         'spike_data.npz',
         X=np.array(X_input_test),
@@ -163,7 +179,7 @@ def evaluate_encoder(args):
     )
 
 
-    return svm_score_input,avg_spike_rate, svm_score_baseline
+    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)

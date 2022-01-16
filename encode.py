@@ -31,13 +31,14 @@ def encode(args):
     pwd = os. getcwd()
 
     if args.dataset == "bci3":
-        data_dir = pwd + "\\dataset\\bci_3.npz"
+        data_dir = pwd + "/dataset/bci3.npz"
         fs = 1000
         nb_channels = 64
         
-    else:
-        print("Invalid dataset")
-        fs = 1000
+    elif args.dataset =="zt_mot":
+      data_dir = pwd + "/dataset/zt_mot.npz"
+      nb_channels=48
+      fs = 250
 
     #Add data here
     X_Train = []
@@ -46,21 +47,21 @@ def encode(args):
     Y_Test = []
 
     data = np.load(data_dir)
-    X_Train = data['X']
-    Y_Train = data['events']
+    X_Train = data['X_Train']
+    Y_Train = data['Y_Train']
 
-    X_Test = data['X']
-    Y_Test = data['events']
+    X_Test = data['X_Test']
+    Y_Test = data['Y_Test']
 
 
 
     X_Train = np.array(X_Train)
 
-    X_Train = np.moveaxis(X_Train, 2, 1)
+    #X_Train = np.moveaxis(X_Train, 2, 1)
     Y_Train = np.array(Y_Train)
 
     X_Test = np.array(X_Test)
-    X_Test = np.moveaxis(X_Test, 2, 1)
+    #X_Test = np.moveaxis(X_Test, 2, 1)
     Y_Test = np.array(Y_Test)
 
     # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
@@ -129,7 +130,7 @@ def encode(args):
 
 
 
-    nb_trials = X_Train.shape[0]
+    nb_trials = X_Test.shape[0]
 
         
     # print(len(X))

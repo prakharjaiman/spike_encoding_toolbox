@@ -19,13 +19,13 @@ def args():
     )
     parser.add_argument(
         "--encode_thr_up",
-        default=5,
+        default=0.5,
         type=float,
         help="Threshold UP for spike encoding" "e.g. 0.25, 0.50 etc.",
     )
     parser.add_argument(
         "--encode_thr_dn",
-        default=5,
+        default=0.5,
         type=float,
         help="Threshold UP for spike encoding" "e.g. 0.25, 0.50 etc.",
     )

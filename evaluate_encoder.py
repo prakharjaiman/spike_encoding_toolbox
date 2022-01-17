@@ -168,11 +168,11 @@ def evaluate_encoder(args):
     rf_score_comb=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
 
     
-    cls_auto = autosklearn.classification.AutoSklearnClassifier()
+    '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
     cls_auto.fit(X_input_train_comb, Y_input_train)
     predictions = cls_auto.predict(X_input_test_comb)
     from sklearn import metrics
-    auto_score=metrics.accuracy_score(Y_input_test, predictions)
+    auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
 
 
     pwd = os.getcwd()

@@ -21,46 +21,42 @@ if __name__ == '__main__':
 	seed = 50
 	random.seed(seed)
 	np.random.seed(seed)
-	df = pd.DataFrame({	"dataset":[],
-						"encode_thr_up":[],
-						"encode_thr_dn":[],
-						"encode_refractory" :[],
-						"encode_interpfact":[],
-                        "firing_rate":[],
-                        "svm_score":[],
-                        "rf_score":[],
-                        "svm_score_baseline":[]
-                         })
+	df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[], "auto_score":[]})
 
 	parameters = dict(
 		dataset = [ 'bci3']
-		,encode_thr_up = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    ,encode_thr_dn = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+		,encode_thr_up = [1.1]
+    	,encode_thr_dn = [1.1]
+		,tstep=[500,3000]
 		,interpfact = [1]
 		,refractory = [1]
+		
     #,tstep=[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
 		# , fold=[1,2,3]
     )
 	param_values = [v for v in parameters.values()]
 
-	for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.encode_interpfact,args.encode_refractory in product(*param_values):
+	for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory in product(*param_values):
 
 
     #args.tstep = tstep
 		args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
 
-		svm_score, rf_score, firing_rate, svm_score_baseline = evaluate_encoder(args)
+		svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb, auto_score = evaluate_encoder(args)
 		df = df.append({ "dataset":args.dataset,
 						 "fold":args.fold,
 						 "encode_thr_up":args.encode_thr_up,
 						 "encode_thr_dn":args.encode_thr_dn,
+						 "tstep": args.tstep,
 						 "encode_refractory": args.encode_refractory,
-						 "encode_interpfact": args.encode_interpfact,
-             "tstep": args.tstep,
+						 "encode_interpfact": args.encode_interpfact,			 
 		                 "firing_rate":firing_rate,
 		                 "svm_score":svm_score,
-                     "rf_score":rf_score,
-		                 "svm_score_baseline":svm_score_baseline
+                     	 "rf_score":rf_score,
+		                 "svm_score_baseline":svm_score_baseline,
+						 "svm_score_comb":svm_score_comb,
+						 "rf_score_comb":rf_score_comb,
+						 "auto_score":auto_score
 		                 },ignore_index=True)
 
 		timestr = time.strftime("%Y%m%d-%H%M%S")

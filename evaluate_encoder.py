@@ -32,6 +32,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE,SelectFromModel
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+import autosklearn.classification
 
 def evaluate_encoder(args):
 
@@ -129,8 +130,49 @@ def evaluate_encoder(args):
 
     rf_w = RandomForestClassifier(n_estimators=300)
     rf_w.fit(X_input_train, Y_input_train)
+    #print("THESHAPE OF X_input_train"+len(X_input_train))
     y_pred_rf_w = rf_w.predict(X_input_test)
     rf_score_input=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
+
+    print("THIS")
+    X_input_train_n = np.array(X_input_train)
+    for i in range(0,len(X_input_train)):
+        if i==0:
+            X_input_train_n=X_input_train[0]
+        else:
+            X_input_train_n=np.vstack((X_input_train_n, X_input_train[i]))
+    print(X_input_train_n.shape)
+    
+    X_input_test_n = np.array(X_input_test)
+    for i in range(0,len(X_input_test)):
+        if i==0:
+            X_input_test_n=X_input_test[0]
+        else:
+            X_input_test_n=np.vstack((X_input_test_n, X_input_test[i]))
+ 
+
+    X_input_train_comb=np.hstack((X_input_train_n, X_train))
+    X_input_test_comb=np.hstack((X_input_test_n, X_test))
+
+    clf_svm_comb = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
+    clf_svm_comb.fit(X_input_train_comb, Y_input_train)
+    #print("THESHAPE OF X_train"+str(X_train.shape))
+    svm_score_comb = clf_svm_comb.score(X_input_test_comb, Y_input_test)
+    print("combined accuraccy: ")
+    print(svm_score_comb)
+
+    rf_w_comb = RandomForestClassifier(n_estimators=300)
+    rf_w_comb.fit(X_input_train_comb, Y_input_train)
+    #print("THESHAPE OF X_input_train"+len(X_input_train))
+    y_pred_rf_w = rf_w_comb.predict(X_input_test_comb)
+    rf_score_comb=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
+
+    
+    cls_auto = autosklearn.classification.AutoSklearnClassifier()
+    cls_auto.fit(X_input_train_comb, Y_input_train)
+    predictions = cls_auto.predict(X_input_test_comb)
+    from sklearn import metrics
+    auto_score=metrics.accuracy_score(Y_input_test, predictions)
 
 
     pwd = os.getcwd()
@@ -153,9 +195,16 @@ def evaluate_encoder(args):
     '''
     clf_baseline = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
     clf_baseline.fit(X_train, Y_train)
+    #print("THESHAPE OF X_train"+str(X_train.shape))
     svm_score_baseline = clf_baseline.score(X_test, Y_test)
     print("Baseline accuraccy")
     print(svm_score_baseline)
+    
+
+
+
+    
+
 
     #Confusion matrix
     predictions = clf_baseline.predict(X_test)
@@ -179,7 +228,7 @@ def evaluate_encoder(args):
     )
 
 
-    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline
+    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, auto_score
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)

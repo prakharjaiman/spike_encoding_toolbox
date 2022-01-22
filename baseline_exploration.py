@@ -42,7 +42,7 @@ if __name__ == '__main__':
     #args.tstep = tstep
 		args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
 
-		svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb, auto_score = evaluate_encoder(args)
+		svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)
 		df = df.append({ "dataset":args.dataset,
 						 "fold":args.fold,
 						 "encode_thr_up":args.encode_thr_up,
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 		                 "svm_score_baseline":svm_score_baseline,
 						 "svm_score_comb":svm_score_comb,
 						 "rf_score_comb":rf_score_comb,
-						 "auto_score":auto_score
+						#  "auto_score":auto_score
 		                 },ignore_index=True)
 
 		timestr = time.strftime("%Y%m%d-%H%M%S")

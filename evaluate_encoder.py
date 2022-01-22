@@ -31,8 +31,30 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.ensemble import RandomForestClassifier 
 from sklearn.feature_selection import RFE,SelectFromModel
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
-import autosklearn.classification
+from sklearn import metrics as metrics
+# import autosklearn.classification
+
+def run_random_experiment(seed):
+    args = my_args()
+    
+    np.random.seed(seed)
+    seed=np.random.randint(0, 0xFFFFFFF),
+    args.encode_thr_up=np.random.choice([0, 150])
+    args.encode_thr_dn=np.exp(-1 / np.random.uniform(5, 200))
+    args.tstep=np.random.hoice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0])
+    args.interpfact=np.random.choice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0])
+    args.refractory=np.random.choice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0]) 
+    input_args=[args.encode_thr_up,args.encode_thr_dn,args.tstep,args.interpfact,args.refractory]
+    input_args_string=map(str,input_args)
+    output_file = f"ecog_{seed}.txt"
+    if os.path.exists(output_file):
+        exit(0)
+
+    svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)
+    with open(output_file, "w") as f:
+        results=[svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb]
+        f.write(str(input_args_string))
+        f.write(str(results))
 
 def evaluate_encoder(args):
 
@@ -57,7 +79,7 @@ def evaluate_encoder(args):
     label_list = []
 
     for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
-        print(iteration)
+        # print(iteration)
         times, indices = convert_data_add_format(sample_time_up, sample_time_down)
         rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
                                                          time_array=np.array(times),
@@ -83,7 +105,7 @@ def evaluate_encoder(args):
     #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
     for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
         #TODO: do a TQDM progress bar here
-        print(iteration)
+        # print(iteration)
         times, indices = convert_data_add_format(sample_time_up, sample_time_down)
 
         rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
@@ -168,11 +190,11 @@ def evaluate_encoder(args):
     rf_score_comb=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
 
     
-    cls_auto = autosklearn.classification.AutoSklearnClassifier()
-    cls_auto.fit(X_input_train_comb, Y_input_train)
-    predictions = cls_auto.predict(X_input_test_comb)
-    from sklearn import metrics
-    auto_score=metrics.accuracy_score(Y_input_test, predictions)
+    # cls_auto = autosklearn.classification.AutoSklearnClassifier()
+    # cls_auto.fit(X_input_train_comb, Y_input_train)
+    # predictions = cls_auto.predict(X_input_test_comb)
+    # from sklearn import metrics
+    # auto_score=metrics.accuracy_score(Y_input_test, predictions)
 
 
     pwd = os.getcwd()
@@ -228,7 +250,7 @@ def evaluate_encoder(args):
     )
 
 
-    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, auto_score
+    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb# auto_score
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)

@@ -40,11 +40,11 @@ def run_random_experiment(seed):
     
     np.random.seed(seed)
     seed=np.random.randint(0, 0xFFFFFFF),
-    args.encode_thr_up=np.random.choice([0, 150])
-    args.encode_thr_dn=np.exp(-1 / np.random.uniform(5, 200))
-    args.tstep=np.random.hoice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0])
-    args.interpfact=np.random.choice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0])
-    args.refractory=np.random.choice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0]) 
+    args.encode_thr_up=np.random.uniform(0.1, 2)
+    args.encode_thr_dn=np.random.uniform(0.1, 2)
+    args.tstep=np.random.choice([200,300,500,600,1000,1500,3000])
+    args.interpfact=np.random.choice([1,2,3,4])
+    args.refractory=np.random.choice([0,1,2]) 
     input_args=[args.encode_thr_up,args.encode_thr_dn,args.tstep,args.interpfact,args.refractory]
     input_args_string=map(str,input_args)
     output_file = f"ecog_{seed}.txt"

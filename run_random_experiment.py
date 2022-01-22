@@ -51,9 +51,9 @@ def run_random_experiment(args):
     output_file = f"ecog_{seed}.csv"
     # # if os.path.exists(output_file):
     # #     exit(0)
-
-    svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)
-    results=[svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb]
+    
+    svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)
+    # results=[svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb]
     df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[], "auto_score":[]})
     df = df.append({ "dataset":args.dataset,
 						 "fold":args.fold,
@@ -67,7 +67,7 @@ def run_random_experiment(args):
                      	 "rf_score":rf_score,
 		                 "svm_score_baseline":svm_score_baseline,
 						 "svm_score_comb":svm_score_comb,
-						 "rf_score_comb":rf_score_comb,
+						 "rf_score_comb":rf_score_comb
 						#  "auto_score":auto_score
 		                 },ignore_index=True)
     df.to_csv(output_file, index=False)

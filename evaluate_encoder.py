@@ -34,27 +34,6 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics as metrics
 # import autosklearn.classification
 
-def run_random_experiment(seed):
-    args = my_args()
-    
-    np.random.seed(seed)
-    seed=np.random.randint(0, 0xFFFFFFF),
-    args.encode_thr_up=np.random.choice([0, 150])
-    args.encode_thr_dn=np.exp(-1 / np.random.uniform(5, 200))
-    args.tstep=np.random.hoice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0])
-    args.interpfact=np.random.choice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0])
-    args.refractory=np.random.choice([0.0, 0.05, 0.1, 0.3, 0.5, 1.0]) 
-    input_args=[args.encode_thr_up,args.encode_thr_dn,args.tstep,args.interpfact,args.refractory]
-    input_args_string=map(str,input_args)
-    output_file = f"ecog_{seed}.txt"
-    if os.path.exists(output_file):
-        exit(0)
-
-    svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)
-    with open(output_file, "w") as f:
-        results=[svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb]
-        f.write(str(input_args_string))
-        f.write(str(results))
 
 def evaluate_encoder(args):
 

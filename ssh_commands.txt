@@ -2,6 +2,16 @@ scp -r ..\spike_encoding_toolbox ng1998@narval.computecanada.ca:spike_encoding_t
 scp -r narval:wta_mnist_tio2_results .
 
 ssh narval
-conda create -n env 
-conda activate env   
+
 python evaluate_encoder.py run_random_experiment
+
+
+source env/bin/activate
+pip install numpy numba fire scikit-learn tqdm python-mnist matplotlib
+
+sbatch cc_tio2.sh 
+awk * 1
+awk 1 *|sort -n
+
+
+scp -r ..\spike_encoding_toolbox\run_random_experiment.py ng1998@narval.computecanada.ca:spike_encoding_toolbox

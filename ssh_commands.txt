@@ -1,5 +1,5 @@
 scp -r ..\spike_encoding_toolbox ng1998@narval.computecanada.ca:spike_encoding_toolbox  
-scp -r narval:wta_mnist_tio2_results .
+scp -r narval:ecog_results .
 
 ssh narval
 

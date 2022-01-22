@@ -48,16 +48,29 @@ def run_random_experiment(args):
     args.refractory=np.random.choice([0,1,2]) 
     input_args=[args.encode_thr_up,args.encode_thr_dn,args.tstep,args.interpfact,args.refractory]
     input_args_string=map(str,input_args)
-    output_file = f"ecog_{seed}.txt"
+    output_file = f"ecog_{seed}.csv"
     # # if os.path.exists(output_file):
     # #     exit(0)
 
     svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)
     results=[svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb]
-    
-    with open(output_file, "w") as f:
-        f.write(str(input_args))
-        f.write(str(results))
+    df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[], "auto_score":[]})
+    df = df.append({ "dataset":args.dataset,
+						 "fold":args.fold,
+						 "encode_thr_up":args.encode_thr_up,
+						 "encode_thr_dn":args.encode_thr_dn,
+						 "tstep": args.tstep,
+						 "encode_refractory": args.encode_refractory,
+						 "encode_interpfact": args.encode_interpfact,			 
+		                 "firing_rate":firing_rate,
+		                 "svm_score":svm_score,
+                     	 "rf_score":rf_score,
+		                 "svm_score_baseline":svm_score_baseline,
+						 "svm_score_comb":svm_score_comb,
+						 "rf_score_comb":rf_score_comb,
+						#  "auto_score":auto_score
+		                 },ignore_index=True)
+    df.to_csv(output_file, index=False)
         # f.write('haha')
         
 

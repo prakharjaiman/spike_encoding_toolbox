@@ -23,22 +23,15 @@ if __name__ == '__main__':
 	df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[]})
 
 	parameters = dict(
-		dataset = [ 'bci3']
+		dataset = ["zt_mot", "jc_mot", "fp_mot", "jp_mot", "jm_mot", "ca_mot", "gc_mot", "ug_mot", "wc_mot", "rr_mot", "rh_mot", "gf_mot", "bp_mot", "jt_mot","jf_mot", "cc_mot", "de_mot", "hh_mot", "hl_mot"]
 		,encode_thr_up = [1.1]
     	,encode_thr_dn = [1.1]
-		,tstep=[500,3000]
+		,tstep=[3000]
 		,interpfact = [1]
 		,refractory = [1]
-		
-    #,tstep=[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
-		# , fold=[1,2,3]
     )
 	param_values = [v for v in parameters.values()]
-
 	for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory in product(*param_values):
-
-
-    #args.tstep = tstep
 		args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
 
 		svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)

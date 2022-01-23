@@ -48,7 +48,7 @@ def run_random_experiment(args):
             args.encode_thr_up=np.random.uniform(0.1, 2)
             args.encode_thr_dn=np.random.uniform(0.1, 2)
             args.tstep=np.random.choice([200,300,500,600,1000,1500,3000])
-            args.interpfact=np.random.choice([1])
+            args.interpfact=np.random.choice([1,2])
             args.refractory=np.random.choice([1]) 
             input_args=[args.dataset,args.encode_thr_up,args.encode_thr_dn,args.tstep,args.interpfact,args.refractory]
             svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb = evaluate_encoder(args)

@@ -11,7 +11,8 @@ cd $SLURM_TMPDIR/spike_encoding_toolbox
 
 echo "Starting application"
 mkdir -p "$HOME/ecog_results/"
-if $HOME/env/bin/python run_random_experiment.py --seed $SLURM_ARRAY_TASK_ID; then
+
+if $HOME/env/bin/python run_random_experiment.py --seed $SLURM_ARRAY_TASK_ID ; then
     echo "Copying results"
     mv "ecog_$SLURM_ARRAY_TASK_ID.csv" "$HOME/ecog_results/"
 fi

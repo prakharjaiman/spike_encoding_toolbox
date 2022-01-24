@@ -23,7 +23,7 @@ if __name__ == '__main__':
 	df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[]})
 
 	parameters = dict(
-		dataset = ["zt_mot", "jc_mot", "fp_mot", "jp_mot", "jm_mot", "ca_mot", "gc_mot", "ug_mot", "wc_mot", "rr_mot", "rh_mot", "gf_mot", "bp_mot", "jt_mot","jf_mot", "cc_mot", "de_mot", "hh_mot", "hl_mot"]
+		dataset = ["fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im"]
 		,encode_thr_up = [1.1]
     	,encode_thr_dn = [1.1]
 		,tstep=[3000]

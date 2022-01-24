@@ -131,6 +131,36 @@ def encode(args):
         nb_channels=63
         fs = 1000
 
+    elif args.dataset =="rr_im":
+        data_dir = pwd + "/dataset/rr_im.npz"
+        nb_channels=64
+        fs = 1000
+
+    elif args.dataset =="jc_im":
+        data_dir = pwd + "/dataset/jc_im.npz"
+        nb_channels=48
+        fs = 1000
+
+    elif args.dataset =="jm_im":
+        data_dir = pwd + "/dataset/jm_im.npz"
+        nb_channels=64
+        fs = 1000
+
+    elif args.dataset =="fp_im":
+        data_dir = pwd + "/dataset/fp_im.npz"
+        nb_channels=64
+        fs = 1000
+
+    elif args.dataset =="bp_im":
+        data_dir = pwd + "/dataset/bp_im.npz"
+        nb_channels=46
+        fs = 1000
+
+    elif args.dataset =="rh_im":
+        data_dir = pwd + "/dataset/rh_im.npz"
+        nb_channels=64
+        fs = 1000
+
     #Add data here
     X_Train = []
     Y_Train = []

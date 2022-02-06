@@ -32,6 +32,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE,SelectFromModel
 from sklearn.model_selection import train_test_split
 from sklearn import metrics as metrics
+from genetic_selection import GeneticSelectionCV
 # import autosklearn.classification
 
 
@@ -135,6 +136,35 @@ def evaluate_encoder(args):
     y_pred_rf_w = rf_w.predict(X_input_test)
     rf_score_input=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
 
+    gen={}
+    sel=[]
+    for k in range(args.gen+1):
+      gen[str(k)]=[]
+    estimator = RandomForestClassifier()
+    selector = GeneticSelectionCV(
+    estimator,
+    cv=5,
+    verbose=1,
+    scoring="accuracy",
+    max_features=5,
+    n_population=300,
+    crossover_proba=0.5,
+    mutation_proba=0.2,
+    n_generations=args.gen,
+    crossover_independent_proba=0.5,
+    mutation_independent_proba=0.05,
+    tournament_size=3,
+    n_gen_no_change=10,
+    caching=True,
+    n_jobs=100,)
+    selector = selector.fit(X_input_train, Y_input_train)
+    acc=selector.score(X_input_test, Y_input_test)
+    tempo=np.where(selector.support_.astype(int)==1)[0]
+    sel=tempo
+    for k in range(args.gen+1):
+      gen[str(k)].append(selector.generation_scores_[k])
+    nfeat=sel.shape[0]
+
     print("THIS")
     X_input_train_n = np.array(X_input_train)
     for i in range(0,len(X_input_train)):
@@ -176,7 +206,7 @@ def evaluate_encoder(args):
     auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
 
 
-    pwd = os.getcwd()
+    '''pwd = os.getcwd()
     plot_dir = pwd + '/plots/'
     plt.rcParams.update({'font.size': 16})
     #Confusion matrix
@@ -188,7 +218,7 @@ def evaluate_encoder(args):
     predicted_probas = clf_input.predict_proba(X_input_test)
     ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
     plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
-    plt.clf()
+    plt.clf()'''
 
 
     '''
@@ -208,7 +238,7 @@ def evaluate_encoder(args):
 
 
     #Confusion matrix
-    predictions = clf_baseline.predict(X_test)
+    '''predictions = clf_baseline.predict(X_test)
     ax = skplt.metrics.plot_confusion_matrix(Y_test, predictions, normalize=True)
     plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'confusion'+'.svg')
     plt.clf()
@@ -216,7 +246,7 @@ def evaluate_encoder(args):
     predicted_probas = clf_baseline.predict_proba(X_test)
     ax2 = skplt.metrics.plot_roc(Y_test, predicted_probas)
     plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'roc'+'.svg')
-    plt.clf()
+    plt.clf()'''
     
      
 
@@ -229,7 +259,7 @@ def evaluate_encoder(args):
     )
 
 
-    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb# auto_score
+    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat# auto_score
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)

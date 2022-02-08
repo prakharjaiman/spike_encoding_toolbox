@@ -33,6 +33,8 @@ from sklearn.feature_selection import RFE,SelectFromModel
 from sklearn.model_selection import train_test_split
 from sklearn import metrics as metrics
 from genetic_selection import GeneticSelectionCV
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn import svm
 # import autosklearn.classification
 
 
@@ -121,20 +123,26 @@ def evaluate_encoder(args):
     '''
     Input model for evaluating spike rates features obtained from temporal difference encoding
     '''
+    n_iter=args.niter
+    svma=svm.SVC()
+    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
+    clf = RandomizedSearchCV(svma, distributions, random_state=0)
+    clf.fit(X_input_train, Y_input_train)
+    prediction = clf.predict(X_input_test)
+    svm_score_input=metrics.accuracy_score(Y_input_test,prediction)
+    print("ONEODNE")
 
-    clf_input = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
-    #print("X CLF" + str(X_input_train.shape))
-    #print("Y CLF" + str(Y_input_train.shape))
-    clf_input.fit(X_input_train, Y_input_train)
-    svm_score_input = clf_input.score(X_input_test, Y_input_test)
+
     print("Input test accuraccy")
     print(svm_score_input)
 
-    rf_w = RandomForestClassifier(n_estimators=300)
-    rf_w.fit(X_input_train, Y_input_train)
+    rf = RandomForestClassifier()
+    distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
     #print("THESHAPE OF X_input_train"+len(X_input_train))
-    y_pred_rf_w = rf_w.predict(X_input_test)
-    rf_score_input=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
+    clf.fit(X_input_train, Y_input_train)
+    prediction = clf.predict(X_input_test)
+    rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
 
     gen={}
     sel=[]
@@ -185,18 +193,36 @@ def evaluate_encoder(args):
     X_input_train_comb=np.hstack((X_input_train_n, X_train))
     X_input_test_comb=np.hstack((X_input_test_n, X_test))
 
-    clf_svm_comb = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
-    clf_svm_comb.fit(X_input_train_comb, Y_input_train)
-    #print("THESHAPE OF X_train"+str(X_train.shape))
-    svm_score_comb = clf_svm_comb.score(X_input_test_comb, Y_input_test)
-    print("combined accuraccy: ")
-    print(svm_score_comb)
 
-    rf_w_comb = RandomForestClassifier(n_estimators=300)
-    rf_w_comb.fit(X_input_train_comb, Y_input_train)
+    svma=svm.SVC()
+    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
+    clf = RandomizedSearchCV(svma, distributions, random_state=0)
+    clf.fit(X_input_train_comb, Y_input_train)
+    prediction = clf.predict(X_input_test_comb)
+    svm_score_comb=metrics.accuracy_score(Y_input_test,prediction)
+
+    rf = RandomForestClassifier()
+    distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
+    clf.fit(X_input_train_comb, Y_input_train)
     #print("THESHAPE OF X_input_train"+len(X_input_train))
-    y_pred_rf_w = rf_w_comb.predict(X_input_test_comb)
-    rf_score_comb=metrics.accuracy_score(Y_input_test,y_pred_rf_w)
+    prediction = clf.predict(X_input_test_comb)
+    rf_score_comb=metrics.accuracy_score(Y_input_test,prediction)
+
+    rf_score_individual_input=[]
+    for i in range(X_input_train_n.shape[1]):
+      X_temp_input=X_input_train_n[:,i]
+      X_temp_input=np.reshape(X_temp_input, (X_input_train_n.shape[0],1))
+      X_temp_input_test=X_input_test_n[:,i]
+      X_temp_input_test=np.reshape(X_temp_input_test, (X_input_test_n.shape[0],1))
+      rf = RandomForestClassifier()
+      distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+      clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=100,n_jobs=-1)
+      clf.fit(X_temp_input, Y_input_train)
+      #print("THESHAPE OF X_input_train"+len(X_input_train))
+      y_pred_rf_w = clf.predict(X_temp_input_test)
+      rf_score_individual_input.append(metrics.accuracy_score(Y_input_test,y_pred_rf_w))
+
 
     
     '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
@@ -259,7 +285,7 @@ def evaluate_encoder(args):
     )
 
 
-    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat# auto_score
+    return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat, rf_score_individual_input# auto_score
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)

@@ -80,6 +80,13 @@ def args():
     )
 
     parser.add_argument(
+        "--preprocess",
+        default=1,
+        type=int,
+        help="Time point till which the simulation has to be run",
+    )
+
+    parser.add_argument(
         "--seed",
         default=50,
         type=float,
@@ -100,6 +107,13 @@ def args():
                     help='Fold for train/test'
                           'e.g. 1, 2, 3 ')
 
+    parser.add_argument('--niter', default=100, type=int,
+                    help='Fold for train/test'
+                          'e.g. 1, 2, 3 ')
+
+    parser.add_argument('--scaler', default="Standard", type=str,
+                    help='Fold for train/test'
+                          'e.g. 1, 2, 3 ')
 
     parser.add_argument('--log_file_path', default=None, 
                         help='Path for log file')

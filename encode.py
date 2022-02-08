@@ -20,6 +20,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sc
 from scipy.signal import butter, lfilter, welch, square  # for signal filtering
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from utilis import *
 from args import args as my_args
 
@@ -184,6 +186,72 @@ def encode(args):
     X_Test = np.array(X_Test)
     #X_Test = np.moveaxis(X_Test, 2, 1)
     Y_Test = np.array(Y_Test)
+
+    if(args.preprocess==1):
+      #subsampling by 4 
+      data_2_subs_t=X_Test
+      '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+      for i in range(0, data_test.shape[0]):
+          for j in range(0, data_test.shape[1]):
+              data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+
+      #data_2_subs_t.shape
+      #Common Average Reference
+      for j in range(0, data_2_subs_t.shape[0]):
+          car=np.zeros((data_2_subs_t.shape[2],))
+          for i in range(0, data_2_subs_t.shape[1]):
+              car= car + data_2_subs_t[j,i,:]
+
+          car=car/data_2_subs_t.shape[1]
+          #car.shape
+
+          for k in range(0, data_2_subs_t.shape[1]):
+              data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+
+      #Standard Scaler
+
+      for j in range(0, data_2_subs_t.shape[0]):
+          kr=data_2_subs_t[j,:,:]
+          if(args.scaler=="Standard"):
+            scaler=StandardScaler().fit(kr.T)
+          elif(args.scaler=="Minmax"):
+            scaler=MinMaxScaler().fit(kr.T)
+          data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+
+
+
+      data_2_subs=X_Train
+      '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+      for i in range(0, data_train.shape[0]):
+          for j in range(0, data_train.shape[1]):
+              data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+
+      #data_2_subs.shape
+
+      #Common Average Reference
+      for j in range(0, data_2_subs.shape[0]):
+          car=np.zeros((data_2_subs.shape[2],))
+          for i in range(0, data_2_subs.shape[1]):
+              car= car + data_2_subs[j,i,:]
+
+          car=car/data_2_subs.shape[1]
+          #car.shape
+
+          for k in range(0, data_2_subs.shape[1]):
+              data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+
+      #Standard Scaler
+
+      for j in range(0, data_2_subs.shape[0]):
+          #kr=data_2_subs[j,:,:]
+          kr=data_2_subs[j,:,:]
+          if(args.scaler=="Standard"):
+            scaler=StandardScaler().fit(kr.T)
+          elif(args.scaler=="Minmax"):
+            scaler=MinMaxScaler().fit(kr.T)
+          data_2_subs[j,:,:]=scaler.transform(kr.T).T
+
+
 
     # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
     # makes it incompatible in some cases where uniform input is desired.

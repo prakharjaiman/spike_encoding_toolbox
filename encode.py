@@ -22,6 +22,8 @@ import scipy as sc
 from scipy.signal import butter, lfilter, welch, square  # for signal filtering
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 from utilis import *
 from args import args as my_args
 
@@ -163,195 +165,403 @@ def encode(args):
         nb_channels=64
         fs = 1000
 
-    #Add data here
-    X_Train = []
-    Y_Train = []
-    X_Test = []
-    Y_Test = []
+    spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list=[], [],[], [],[], [],[], [],[]
 
-    data = np.load(data_dir)
-    X_Train = data['X_Train']
-    Y_Train = data['Y_Train']
+    if args.dataset=="bci3":
+        #Add data here
+        X_Train = []
+        Y_Train = []
+        X_Test = []
+        Y_Test = []
 
-    X_Test = data['X_Test']
-    Y_Test = data['Y_Test']
+        data = np.load(data_dir)
+        X_Train = data['X_Train']
+        Y_Train = data['Y_Train']
 
+        X_Test = data['X_Test']
+        Y_Test = data['Y_Test']
 
-
-    X_Train = np.array(X_Train)
-
-    #X_Train = np.moveaxis(X_Train, 2, 1)
-    Y_Train = np.array(Y_Train)
-
-    X_Test = np.array(X_Test)
-    #X_Test = np.moveaxis(X_Test, 2, 1)
-    Y_Test = np.array(Y_Test)
-
-    if(args.preprocess==1):
-      #subsampling by 4 
-      data_2_subs_t=X_Test
-      '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-      for i in range(0, data_test.shape[0]):
-          for j in range(0, data_test.shape[1]):
-              data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
-
-      #data_2_subs_t.shape
-      #Common Average Reference
-      for j in range(0, data_2_subs_t.shape[0]):
-          car=np.zeros((data_2_subs_t.shape[2],))
-          for i in range(0, data_2_subs_t.shape[1]):
-              car= car + data_2_subs_t[j,i,:]
-
-          car=car/data_2_subs_t.shape[1]
-          #car.shape
-
-          for k in range(0, data_2_subs_t.shape[1]):
-              data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
-
-      #Standard Scaler
-
-      for j in range(0, data_2_subs_t.shape[0]):
-          kr=data_2_subs_t[j,:,:]
-          if(args.scaler=="Standard"):
-            scaler=StandardScaler().fit(kr.T)
-          elif(args.scaler=="Minmax"):
-            scaler=MinMaxScaler().fit(kr.T)
-          data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+        X_Train_list.append(X_Train)
+        Y_Train_list.append(Y_Train)
+        X_Test_list.append(X_Test)
+        Y_Test_list.append(Y_Test)
 
 
 
-      data_2_subs=X_Train
-      '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-      for i in range(0, data_train.shape[0]):
-          for j in range(0, data_train.shape[1]):
-              data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+        X_Train = np.array(X_Train)
 
-      #data_2_subs.shape
+        #X_Train = np.moveaxis(X_Train, 2, 1)
+        Y_Train = np.array(Y_Train)
 
-      #Common Average Reference
-      for j in range(0, data_2_subs.shape[0]):
-          car=np.zeros((data_2_subs.shape[2],))
-          for i in range(0, data_2_subs.shape[1]):
-              car= car + data_2_subs[j,i,:]
+        X_Test = np.array(X_Test)
+        #X_Test = np.moveaxis(X_Test, 2, 1)
+        Y_Test = np.array(Y_Test)
 
-          car=car/data_2_subs.shape[1]
-          #car.shape
+        if(args.preprocess==1):
+        #subsampling by 4 
+            data_2_subs_t=X_Test
+        '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+        for i in range(0, data_test.shape[0]):
+            for j in range(0, data_test.shape[1]):
+                data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
 
-          for k in range(0, data_2_subs.shape[1]):
-              data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+        #data_2_subs_t.shape
+        #Common Average Reference
+        for j in range(0, data_2_subs_t.shape[0]):
+            car=np.zeros((data_2_subs_t.shape[2],))
+            for i in range(0, data_2_subs_t.shape[1]):
+                car= car + data_2_subs_t[j,i,:]
 
-      #Standard Scaler
+            car=car/data_2_subs_t.shape[1]
+            #car.shape
 
-      for j in range(0, data_2_subs.shape[0]):
-          #kr=data_2_subs[j,:,:]
-          kr=data_2_subs[j,:,:]
-          if(args.scaler=="Standard"):
-            scaler=StandardScaler().fit(kr.T)
-          elif(args.scaler=="Minmax"):
-            scaler=MinMaxScaler().fit(kr.T)
-          data_2_subs[j,:,:]=scaler.transform(kr.T).T
+            for k in range(0, data_2_subs_t.shape[1]):
+                data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
+        #Standard Scaler
 
-
-    # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
-    # makes it incompatible in some cases where uniform input is desired.
-
-    nb_trials = X_Train.shape[0]
-
-        
-    # print(len(X))
-    print("Number of training samples in dataset:")
-    print(len(X_Train))
-    print(len(Y_Train))
-    # print("Class labels:")
-    # print(list(set(Y_Train)))
-
-    # Take session 0,1 as and session 2 as test.
+        for j in range(0, data_2_subs_t.shape[0]):
+            kr=data_2_subs_t[j,:,:]
+            if(args.scaler=="Standard"):
+                scaler=StandardScaler().fit(kr.T)
+            elif(args.scaler=="Minmax"):
+                scaler=MinMaxScaler().fit(kr.T)
+            data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
 
 
-    interpfact = args.encode_interpfact
-    refractory_period = args.encode_refractory  # in ms
-    th_up = args.encode_thr_up
-    th_dn = args.encode_thr_dn
+
+        data_2_subs=X_Train
+        '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+        for i in range(0, data_train.shape[0]):
+            for j in range(0, data_train.shape[1]):
+                data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+
+        #data_2_subs.shape
+
+        #Common Average Reference
+        for j in range(0, data_2_subs.shape[0]):
+            car=np.zeros((data_2_subs.shape[2],))
+            for i in range(0, data_2_subs.shape[1]):
+                car= car + data_2_subs[j,i,:]
+
+            car=car/data_2_subs.shape[1]
+            #car.shape
+
+            for k in range(0, data_2_subs.shape[1]):
+                data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+
+        #Standard Scaler
+
+        for j in range(0, data_2_subs.shape[0]):
+            #kr=data_2_subs[j,:,:]
+            kr=data_2_subs[j,:,:]
+            if(args.scaler=="Standard"):
+                scaler=StandardScaler().fit(kr.T)
+            elif(args.scaler=="Minmax"):
+                scaler=MinMaxScaler().fit(kr.T)
+            data_2_subs[j,:,:]=scaler.transform(kr.T).T
 
 
-    # Generate the  data
-    X=X_Train
-    Y=Y_Train
-    spike_times_train_up = []
-    spike_times_train_dn = []
-    for i in range(len(X)):
-        spk_up, spk_dn = gen_spike_time(
-            time_series_data=X[i],
-            interpfact=interpfact,
-            fs=fs,
-            th_up=th_up,
-            th_dn=th_dn,
-            refractory_period=refractory_period,
-        )
-        spike_times_train_up.append(spk_up)
-        spike_times_train_dn.append(spk_dn)
-    
 
-    rate_up = gen_spike_rate(spike_times_train_up)
-    rate_dn = gen_spike_rate(spike_times_train_dn)
-    avg_spike_rate = (rate_up+rate_dn)/2
-    print("Average spiking rate")
-    print(avg_spike_rate)
+        # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
+        # makes it incompatible in some cases where uniform input is desired.
+
+        nb_trials = X_Train.shape[0]
+
+            
+        # print(len(X))
+        print("Number of training samples in dataset:")
+        print(len(X_Train))
+        print(len(Y_Train))
+        # print("Class labels:")
+        # print(list(set(Y_Train)))
+
+        # Take session 0,1 as and session 2 as test.
+
+
+        interpfact = args.encode_interpfact
+        refractory_period = args.encode_refractory  # in ms
+        th_up = args.encode_thr_up
+        th_dn = args.encode_thr_dn
+
 
         # Generate the  data
-    X=X_Test
-    Y=Y_Test
-    spike_times_test_up = []
-    spike_times_test_dn = []
-    for i in range(len(X)):
-        spk_up, spk_dn = gen_spike_time(
-            time_series_data=X[i],
-            interpfact=interpfact,
-            fs=fs,
-            th_up=th_up,
-            th_dn=th_dn,
-            refractory_period=refractory_period,
-        )
-        spike_times_test_up.append(spk_up)
-        spike_times_test_dn.append(spk_dn)
-    
-
-
-
-    nb_trials = X_Test.shape[0]
+        X=X_Train
+        Y=Y_Train
+        spike_times_train_up = []
+        spike_times_train_dn = []
+        for i in range(len(X)):
+            spk_up, spk_dn = gen_spike_time(
+                time_series_data=X[i],
+                interpfact=interpfact,
+                fs=fs,
+                th_up=th_up,
+                th_dn=th_dn,
+                refractory_period=refractory_period,
+            )
+            spike_times_train_up.append(spk_up)
+            spike_times_train_dn.append(spk_dn)
+        spike_times_train_up_list.append(spike_times_train_up)
+        spike_times_train_dn_list.append(spike_times_train_dn)
 
         
-    # print(len(X))
-    print("Number of test samples in dataset:")
-    print(len(X_Test))
-    print(len(Y_Test))
-    # print("Class labels:")
-    # print(list(set(Y_Test)))
+
+        rate_up = gen_spike_rate(spike_times_train_up)
+        rate_dn = gen_spike_rate(spike_times_train_dn)
+        avg_spike_rate = (rate_up+rate_dn)/2
+        print("Average spiking rate")
+        print(avg_spike_rate)
+
+            # Generate the  data
+        X=X_Test
+        Y=Y_Test
+        spike_times_test_up = []
+        spike_times_test_dn = []
+        for i in range(len(X)):
+            spk_up, spk_dn = gen_spike_time(
+                time_series_data=X[i],
+                interpfact=interpfact,
+                fs=fs,
+                th_up=th_up,
+                th_dn=th_dn,
+                refractory_period=refractory_period,
+            )
+            spike_times_test_up.append(spk_up)
+            spike_times_test_dn.append(spk_dn)
+        spike_times_test_up_list.append(spike_times_test_up)
+        spike_times_test_dn_list.append(spike_times_test_dn)
+        
 
 
-    spike_times_train_up = np.array(spike_times_train_up)
-    spike_times_test_up = np.array(spike_times_test_up)
-    spike_times_train_dn = np.array(spike_times_train_dn)
-    spike_times_test_dn = np.array(spike_times_test_dn)
+
+        nb_trials = X_Test.shape[0]
+
+            
+        # print(len(X))
+        print("Number of test samples in dataset:")
+        print(len(X_Test))
+        print(len(Y_Test))
+        # print("Class labels:")
+        # print(list(set(Y_Test)))
 
 
-    file_path = "dataset/"
-    file_name = args.encoded_data_file_prefix + str(args.dataset) + str(args.encode_thr_up) + str(
-        args.encode_thr_dn) + str(args.encode_refractory) + str(args.encode_interpfact) + ".npz"
+        spike_times_train_up = np.array(spike_times_train_up)
+        spike_times_test_up = np.array(spike_times_test_up)
+        spike_times_train_dn = np.array(spike_times_train_dn)
+        spike_times_test_dn = np.array(spike_times_test_dn)
 
-    np.savez_compressed(
-        file_path + file_name,
-        # X_Train=X_Train,
-        Y_Train=Y_Train,
-        # X_Test=X_Test,
-        Y_Test=Y_Test,
-        spike_times_train_up=spike_times_train_up,
-        spike_times_train_dn=spike_times_train_dn,
-        spike_times_test_up=spike_times_test_up,
-        spike_times_test_dn=spike_times_test_dn,
-    )
-    return spike_times_train_up, spike_times_train_dn, spike_times_test_up, spike_times_test_dn, X_Train,X_Test, Y_Train,Y_Test,avg_spike_rate
+
+        file_path = "dataset/"
+        file_name = args.encoded_data_file_prefix + str(args.dataset) + str(args.encode_thr_up) + str(
+            args.encode_thr_dn) + str(args.encode_refractory) + str(args.encode_interpfact) + ".npz"
+
+        np.savez_compressed(
+            file_path + file_name,
+            # X_Train=X_Train,
+            Y_Train=Y_Train,
+            # X_Test=X_Test,
+            Y_Test=Y_Test,
+            spike_times_train_up=spike_times_train_up,
+            spike_times_train_dn=spike_times_train_dn,
+            spike_times_test_up=spike_times_test_up,
+            spike_times_test_dn=spike_times_test_dn,
+        )
+        return spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
+
+    else:
+        #Add data here
+        X_Train = []
+        Y_Train = []
+        X_Test = []
+        Y_Test = []
+
+        data = np.load(data_dir)
+        X_Train = data['X_Train']
+        Y_Train = data['Y_Train']
+
+        kf3 = KFold(n_splits=args.kfold, shuffle=False)
+        
+        for train_index, test_index in kf3.split(X_Train):
+            X_Tr = X_Train[train_index]
+            Y_Tr = Y_Train[train_index]
+            X_Test = X_Train[test_index]
+            Y_Test = Y_Train[test_index]
+            X_Train_list.append(X_Tr)
+            Y_Train_list.append(Y_Tr)
+            X_Test_list.append(X_Test)
+            Y_Test_list.append(Y_Test)
+
+
+
+            if(args.preprocess==1):
+            #subsampling by 4 
+                data_2_subs_t=X_Test
+            '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+            for i in range(0, data_test.shape[0]):
+                for j in range(0, data_test.shape[1]):
+                    data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+
+            #data_2_subs_t.shape
+            #Common Average Reference
+            for j in range(0, data_2_subs_t.shape[0]):
+                car=np.zeros((data_2_subs_t.shape[2],))
+                for i in range(0, data_2_subs_t.shape[1]):
+                    car= car + data_2_subs_t[j,i,:]
+
+                car=car/data_2_subs_t.shape[1]
+                #car.shape
+
+                for k in range(0, data_2_subs_t.shape[1]):
+                    data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+
+            #Standard Scaler
+
+            for j in range(0, data_2_subs_t.shape[0]):
+                kr=data_2_subs_t[j,:,:]
+                if(args.scaler=="Standard"):
+                    scaler=StandardScaler().fit(kr.T)
+                elif(args.scaler=="Minmax"):
+                    scaler=MinMaxScaler().fit(kr.T)
+                data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+
+
+
+            data_2_subs=X_Tr
+            '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+            for i in range(0, data_train.shape[0]):
+                for j in range(0, data_train.shape[1]):
+                    data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+
+            #data_2_subs.shape
+
+            #Common Average Reference
+            for j in range(0, data_2_subs.shape[0]):
+                car=np.zeros((data_2_subs.shape[2],))
+                for i in range(0, data_2_subs.shape[1]):
+                    car= car + data_2_subs[j,i,:]
+
+                car=car/data_2_subs.shape[1]
+                #car.shape
+
+                for k in range(0, data_2_subs.shape[1]):
+                    data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+
+            #Standard Scaler
+
+            for j in range(0, data_2_subs.shape[0]):
+                #kr=data_2_subs[j,:,:]
+                kr=data_2_subs[j,:,:]
+                if(args.scaler=="Standard"):
+                    scaler=StandardScaler().fit(kr.T)
+                elif(args.scaler=="Minmax"):
+                    scaler=MinMaxScaler().fit(kr.T)
+                data_2_subs[j,:,:]=scaler.transform(kr.T).T
+
+
+
+            # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
+            # makes it incompatible in some cases where uniform input is desired.
+
+            nb_trials = X_Tr.shape[0]
+
+                
+            # print(len(X))
+            print("Number of training samples in dataset:")
+            print(len(X_Tr))
+            print(len(Y_Tr))
+            # print("Class labels:")
+            # print(list(set(Y_Train)))
+
+            # Take session 0,1 as and session 2 as test.
+
+
+            interpfact = args.encode_interpfact
+            refractory_period = args.encode_refractory  # in ms
+            th_up = args.encode_thr_up
+            th_dn = args.encode_thr_dn
+
+
+            # Generate the  data
+            X=X_Tr
+            Y=Y_Tr
+            spike_times_train_up = []
+            spike_times_train_dn = []
+            for i in range(len(X)):
+                spk_up, spk_dn = gen_spike_time(
+                    time_series_data=X[i],
+                    interpfact=interpfact,
+                    fs=fs,
+                    th_up=th_up,
+                    th_dn=th_dn,
+                    refractory_period=refractory_period,
+                )
+                spike_times_train_up.append(spk_up)
+                spike_times_train_dn.append(spk_dn)
+            spike_times_train_up_list.append(spike_times_train_up)
+            spike_times_train_dn_list.append(spike_times_train_dn)
+
+            rate_up = gen_spike_rate(spike_times_train_up)
+            rate_dn = gen_spike_rate(spike_times_train_dn)
+            avg_spike_rate = (rate_up+rate_dn)/2
+            print("Average spiking rate")
+            print(avg_spike_rate)
+            avg_spike_rate_list.append(avg_spike_rate)
+
+                # Generate the  data
+            X=X_Test
+            Y=Y_Test
+            spike_times_test_up = []
+            spike_times_test_dn = []
+            for i in range(len(X)):
+                spk_up, spk_dn = gen_spike_time(
+                    time_series_data=X[i],
+                    interpfact=interpfact,
+                    fs=fs,
+                    th_up=th_up,
+                    th_dn=th_dn,
+                    refractory_period=refractory_period,
+                )
+                spike_times_test_up.append(spk_up)
+                spike_times_test_dn.append(spk_dn)
+            spike_times_test_up_list.append(spike_times_test_up)
+            spike_times_test_dn_list.append(spike_times_test_dn)
+
+
+
+            nb_trials = X_Test.shape[0]
+
+                
+            # print(len(X))
+            print("Number of test samples in dataset:")
+            print(len(X_Test))
+            print(len(Y_Test))
+            # print("Class labels:")
+            # print(list(set(Y_Test)))
+
+
+            spike_times_train_up = np.array(spike_times_train_up)
+            spike_times_test_up = np.array(spike_times_test_up)
+            spike_times_train_dn = np.array(spike_times_train_dn)
+            spike_times_test_dn = np.array(spike_times_test_dn)
+
+
+            file_path = "dataset/"
+            file_name = args.encoded_data_file_prefix + str(args.dataset) + str(args.encode_thr_up) + str(
+                args.encode_thr_dn) + str(args.encode_refractory) + str(args.encode_interpfact) + ".npz"
+
+            np.savez_compressed(
+                file_path + file_name,
+                # X_Train=X_Train,
+                Y_Train=Y_Tr,
+                # X_Test=X_Test,
+                Y_Test=Y_Test,
+                spike_times_train_up=spike_times_train_up,
+                spike_times_train_dn=spike_times_train_dn,
+                spike_times_test_up=spike_times_test_up,
+                spike_times_test_dn=spike_times_test_dn,
+            )
+            return spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
+
 
 if __name__ == '__main__':
     args = my_args()

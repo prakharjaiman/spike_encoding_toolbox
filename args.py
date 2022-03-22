@@ -114,6 +114,10 @@ def args():
     parser.add_argument('--scaler', default="Standard", type=str,
                     help='Fold for train/test'
                           'e.g. 1, 2, 3 ')
+    
+    parser.add_argument("--kfold",default=3,type=int,
+        help="number of folds in kfold",
+    )
 
     parser.add_argument('--log_file_path', default=None, 
                         help='Path for log file')

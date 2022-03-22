@@ -396,66 +396,66 @@ def encode(args):
             if(args.preprocess==1):
             #subsampling by 4 
                 data_2_subs_t=X_Test
-            '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-            for i in range(0, data_test.shape[0]):
-                for j in range(0, data_test.shape[1]):
-                    data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+                '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+                for i in range(0, data_test.shape[0]):
+                    for j in range(0, data_test.shape[1]):
+                        data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
 
-            #data_2_subs_t.shape
-            #Common Average Reference
-            for j in range(0, data_2_subs_t.shape[0]):
-                car=np.zeros((data_2_subs_t.shape[2],))
-                for i in range(0, data_2_subs_t.shape[1]):
-                    car= car + data_2_subs_t[j,i,:]
+                #data_2_subs_t.shape
+                #Common Average Reference
+                for j in range(0, data_2_subs_t.shape[0]):
+                    car=np.zeros((data_2_subs_t.shape[2],))
+                    for i in range(0, data_2_subs_t.shape[1]):
+                        car= car + data_2_subs_t[j,i,:]
 
-                car=car/data_2_subs_t.shape[1]
-                #car.shape
+                    car=car/data_2_subs_t.shape[1]
+                    #car.shape
 
-                for k in range(0, data_2_subs_t.shape[1]):
-                    data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+                    for k in range(0, data_2_subs_t.shape[1]):
+                        data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
-            #Standard Scaler
+                #Standard Scaler
 
-            for j in range(0, data_2_subs_t.shape[0]):
-                kr=data_2_subs_t[j,:,:]
-                if(args.scaler=="Standard"):
-                    scaler=StandardScaler().fit(kr.T)
-                elif(args.scaler=="Minmax"):
-                    scaler=MinMaxScaler().fit(kr.T)
-                data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+                for j in range(0, data_2_subs_t.shape[0]):
+                    kr=data_2_subs_t[j,:,:]
+                    if(args.scaler=="Standard"):
+                        scaler=StandardScaler().fit(kr.T)
+                    elif(args.scaler=="Minmax"):
+                        scaler=MinMaxScaler().fit(kr.T)
+                    data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
 
 
 
-            data_2_subs=X_Tr
-            '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-            for i in range(0, data_train.shape[0]):
-                for j in range(0, data_train.shape[1]):
-                    data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+                data_2_subs=X_Tr
+                '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+                for i in range(0, data_train.shape[0]):
+                    for j in range(0, data_train.shape[1]):
+                        data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
 
-            #data_2_subs.shape
+                #data_2_subs.shape
 
-            #Common Average Reference
-            for j in range(0, data_2_subs.shape[0]):
-                car=np.zeros((data_2_subs.shape[2],))
-                for i in range(0, data_2_subs.shape[1]):
-                    car= car + data_2_subs[j,i,:]
+                #Common Average Reference
+                for j in range(0, data_2_subs.shape[0]):
+                    car=np.zeros((data_2_subs.shape[2],))
+                    for i in range(0, data_2_subs.shape[1]):
+                        car= car + data_2_subs[j,i,:]
 
-                car=car/data_2_subs.shape[1]
-                #car.shape
+                    car=car/data_2_subs.shape[1]
+                    #car.shape
 
-                for k in range(0, data_2_subs.shape[1]):
-                    data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+                    for k in range(0, data_2_subs.shape[1]):
+                        data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
 
-            #Standard Scaler
+                #Standard Scaler
 
-            for j in range(0, data_2_subs.shape[0]):
-                #kr=data_2_subs[j,:,:]
-                kr=data_2_subs[j,:,:]
-                if(args.scaler=="Standard"):
-                    scaler=StandardScaler().fit(kr.T)
-                elif(args.scaler=="Minmax"):
-                    scaler=MinMaxScaler().fit(kr.T)
-                data_2_subs[j,:,:]=scaler.transform(kr.T).T
+                for j in range(0, data_2_subs.shape[0]):
+                    #kr=data_2_subs[j,:,:]
+                    kr=data_2_subs[j,:,:]
+                    if(args.scaler=="Standard"):
+                        scaler=StandardScaler().fit(kr.T)
+                    elif(args.scaler=="Minmax"):
+                        scaler=MinMaxScaler().fit(kr.T)
+                    data_2_subs[j,:,:]=scaler.transform(kr.T).T
 
 
 

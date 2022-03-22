@@ -376,8 +376,8 @@ def encode(args):
         Y_Test = []
 
         data = np.load(data_dir)
-        X_Train = data['X_Train']
-        Y_Train = data['Y_Train']
+        X_Train = data['X']
+        Y_Train = data['y']
 
         kf3 = KFold(n_splits=args.kfold, shuffle=False)
         

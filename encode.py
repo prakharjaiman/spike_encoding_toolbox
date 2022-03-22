@@ -40,128 +40,128 @@ def encode(args):
         nb_channels = 64
         
     elif args.dataset =="zt_mot":
-      data_dir = pwd + "/dataset/zt_mot.npz"
+      data_dir = pwd + "/dataset/zt_mot_epochs.npz"
       nb_channels=48
       fs = 1000
 
     elif args.dataset =="jc_mot":
-      data_dir = pwd + "/dataset/jc_mot.npz"
+      data_dir = pwd + "/dataset/jc_mot_epochs.npz"
       nb_channels=48
       fs = 1000
 
     elif args.dataset =="fp_mot":
-      data_dir = pwd + "/dataset/fp_mot.npz"
+      data_dir = pwd + "/dataset/fp_mot_epochs.npz"
       nb_channels=62
       fs = 1000
 
     elif args.dataset =="ca_mot":
-        data_dir = pwd + "/dataset/ca_mot.npz"
+        data_dir = pwd + "/dataset/ca_mot_epochs.npz"
         nb_channels=59
         fs = 1000
         
     elif args.dataset =="jp_mot":
-        data_dir = pwd + "/dataset/jp_mot.npz"
+        data_dir = pwd + "/dataset/jp_mot_epochs.npz"
         nb_channels=58
         fs = 1000
 
     elif args.dataset =="jm_mot":
-        data_dir = pwd + "/dataset/jm_mot.npz"
+        data_dir = pwd + "/dataset/jm_mot_epochs.npz"
         nb_channels=63
         fs = 1000
 
     elif args.dataset =="hh_mot":
-        data_dir = pwd + "/dataset/hh_mot.npz"
+        data_dir = pwd + "/dataset/hh_mot_epochs.npz"
         nb_channels=41
         fs = 1000   
 
     elif args.dataset =="hl_mot":
-        data_dir = pwd + "/dataset/hl_mot.npz"
+        data_dir = pwd + "/dataset/hl_mot_epochs.npz"
         nb_channels=64
         fs = 1000  
 
     elif args.dataset =="gc_mot":
-        data_dir = pwd + "/dataset/gc_mot.npz"
+        data_dir = pwd + "/dataset/gc_mot_epochs.npz"
         nb_channels=64
         fs = 1000  
 
     elif args.dataset =="ug_mot":
-        data_dir = pwd + "/dataset/ug_mot.npz"
+        data_dir = pwd + "/dataset/ug_mot_epochs.npz"
         nb_channels=25
         fs = 1000  
 
     elif args.dataset =="wc_mot":
-        data_dir = pwd + "/dataset/wc_mot.npz"
+        data_dir = pwd + "/dataset/wc_mot_epochs.npz"
         nb_channels=64
         fs = 1000
 
 
     elif args.dataset =="jf_mot":
-        data_dir = pwd + "/dataset/jf_mot.npz"
+        data_dir = pwd + "/dataset/jf_mot_epochs.npz"
         nb_channels=39
         fs = 1000
 
     elif args.dataset =="bp_mot":
-        data_dir = pwd + "/dataset/bp_mot.npz"
+        data_dir = pwd + "/dataset/bp_mot_epochs.npz"
         nb_channels=47
         fs = 1000
 
     elif args.dataset =="de_mot":
-        data_dir = pwd + "/dataset/de_mot.npz"
+        data_dir = pwd + "/dataset/de_mot_epochs.npz"
         nb_channels=64
         fs = 1000
 
     elif args.dataset =="cc_mot":
-        data_dir = pwd + "/dataset/cc_mot.npz"
+        data_dir = pwd + "/dataset/cc_mot_epochs.npz"
         nb_channels=64
         fs = 1000
 
     elif args.dataset =="rr_mot":
-        data_dir = pwd + "/dataset/rr_mot.npz"
+        data_dir = pwd + "/dataset/rr_mot_epochs.npz"
         nb_channels=49
         fs = 1000
 
     elif args.dataset =="jt_mot":
-        data_dir = pwd + "/dataset/jt_mot.npz"
+        data_dir = pwd + "/dataset/jt_mot_epochs.npz"
         nb_channels=62
         fs = 1000
 
     elif args.dataset =="gf_mot":
-        data_dir = pwd + "/dataset/gf_mot.npz"
+        data_dir = pwd + "/dataset/gf_mot_epochs.npz"
         nb_channels=63
         fs = 1000
 
     elif args.dataset =="rh_mot":
-        data_dir = pwd + "/dataset/rh_mot.npz"
+        data_dir = pwd + "/dataset/rh_mot_epochs.npz"
         nb_channels=63
         fs = 1000
 
     elif args.dataset =="rr_im":
-        data_dir = pwd + "/dataset/rr_im.npz"
+        data_dir = pwd + "/dataset/rr_im_epochs.npz"
         nb_channels=64
         fs = 1000
 
     elif args.dataset =="jc_im":
-        data_dir = pwd + "/dataset/jc_im.npz"
+        data_dir = pwd + "/dataset/jc_im_epochs.npz"
         nb_channels=48
         fs = 1000
 
     elif args.dataset =="jm_im":
-        data_dir = pwd + "/dataset/jm_im.npz"
+        data_dir = pwd + "/dataset/jm_im_epochs.npz"
         nb_channels=64
         fs = 1000
 
     elif args.dataset =="fp_im":
-        data_dir = pwd + "/dataset/fp_im.npz"
+        data_dir = pwd + "/dataset/fp_im_epochs.npz"
         nb_channels=64
         fs = 1000
 
     elif args.dataset =="bp_im":
-        data_dir = pwd + "/dataset/bp_im.npz"
+        data_dir = pwd + "/dataset/bp_im_epochs.npz"
         nb_channels=46
         fs = 1000
 
     elif args.dataset =="rh_im":
-        data_dir = pwd + "/dataset/rh_im.npz"
+        data_dir = pwd + "/dataset/rh_im_epochs.npz"
         nb_channels=64
         fs = 1000
 

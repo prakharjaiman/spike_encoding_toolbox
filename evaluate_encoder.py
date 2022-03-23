@@ -47,7 +47,7 @@ def evaluate_encoder(args):
     print(args.__dict__)
 
     spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list = encode(args)
-    svm_score_input_list,rf_score_input_list, svm_score_baseline_list, svm_score_comb_list, rf_score_comb_list, acc_list, sel_list, gen_list, nfeat_list, rf_score_individual_input_list=[],[],[],[],[],[],[],[],[],[],[]
+    svm_score_input_list,rf_score_input_list, svm_score_baseline_list, svm_score_comb_list, rf_score_comb_list, acc_list, sel_list, gen_list, nfeat_list, rf_score_individual_input_list=[],[],[],[],[],[],[],[],[],[]
     if args.dataset=="bci3":
 
         nbtimepoints = int(args.duration / args.tstep)

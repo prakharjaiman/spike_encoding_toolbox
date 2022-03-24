@@ -560,7 +560,7 @@ def encode(args):
                 spike_times_test_up=spike_times_test_up,
                 spike_times_test_dn=spike_times_test_dn,
             )
-            return spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
+        return spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
 
 
 if __name__ == '__main__':

@@ -53,7 +53,7 @@ if __name__ == '__main__':
                       "svm_score_baseline":svm_score_baseline,
               "svm_score_comb":svm_score_comb,
               "rf_score_comb":rf_score_comb,
-              "gen_accuracy":gen[str(n)],
+              "gen_accuracy":gen,
               "generation":n,
               "selected_features":sel,
               "genetic_final_accuracy":acc,

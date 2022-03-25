@@ -72,14 +72,14 @@ if __name__ == '__main__':
     log_dir = pwd+'/log_dir/'
     df.to_csv(log_dir+log_file_name, index=False)
 
-    accuracy_df = pd.DataFrame({"Electrodes": np.arange(1,len(rf_score_individual_input)+1), "Accuracy":rf_score_individual_input})
+    '''accuracy_df = pd.DataFrame({"Electrodes": np.arange(1,len(rf_score_individual_input)+1), "Accuracy":rf_score_individual_input})
     # plot the feature importances in bars.
     plt.figure(figsize=(20,10))
     #plt.xticks(rotation=45)
     sns.set(font_scale=3)
     sns.lineplot(x="Electrodes",y= "Accuracy", data=accuracy_df)
     plt.savefig('./figures/accuracy_individual_'+args.dataset+'.png')
-    plt.show()
+    plt.show()'''
 
   df.to_csv(log_file_name, index=False)
 	# logger.info('All done.')

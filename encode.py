@@ -199,73 +199,90 @@ def encode(args):
 
         if(args.preprocess==1):
         #subsampling by 4 
+            data_2_subs=X_Train
+            '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+            for i in range(0, data_train.shape[0]):
+                for j in range(0, data_train.shape[1]):
+                    data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+
+            #data_2_subs.shape
+            
+            
+            for j in range(0, X_Train.shape[0]):
+                car=np.zeros((data_2_subs.shape[2],))
+                for i in range(0, X_Train.shape[1]):
+                    car= car + data_2_subs[j,i,:]
+                car=car/X_Train.shape[1]
+                #car.shape
+                for k in range(0, X_Train.shape[1]):
+                    data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+                        
+            #subsampling by 4 
             data_2_subs_t=X_Test
-        '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-        for i in range(0, data_test.shape[0]):
-            for j in range(0, data_test.shape[1]):
-                data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+            '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+            for i in range(0, data_test.shape[0]):
+                for j in range(0, data_test.shape[1]):
+                    data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
 
-        #data_2_subs_t.shape
-        #Common Average Reference
-        for j in range(0, data_2_subs_t.shape[0]):
-            car=np.zeros((data_2_subs_t.shape[2],))
-            for i in range(0, data_2_subs_t.shape[1]):
-                car= car + data_2_subs_t[j,i,:]
+            #data_2_subs_t.shape
+            #Common Average Reference
+            #if(c_ref==True):
+            for j in range(0, data_2_subs_t.shape[0]):
+                car=np.zeros((data_2_subs_t.shape[2],))
+                for i in range(0, data_2_subs_t.shape[1]):
+                    car= car + data_2_subs_t[j,i,:]
+                car=car/data_2_subs_t.shape[1]
+                #car.shape
+                for k in range(0, data_2_subs_t.shape[1]):
+                    data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
-            car=car/data_2_subs_t.shape[1]
-            #car.shape
+            #Standard Scaler
 
-            for k in range(0, data_2_subs_t.shape[1]):
-                data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+            #Standard Scaler
 
-        #Standard Scaler
-
-        for j in range(0, data_2_subs_t.shape[0]):
-            kr=data_2_subs_t[j,:,:]
-            if(args.scaler=="Standard"):
+            '''for j in range(0, data_train.shape[0]):
+                kr=data_2_subs[j,:,:]
+                kr=data_2_subs[j,:,:]
+                
                 scaler=StandardScaler().fit(kr.T)
-            elif(args.scaler=="Minmax"):
-                scaler=MinMaxScaler().fit(kr.T)
-            data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+                data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+                
 
-
-
-        data_2_subs=X_Train
-        '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-        for i in range(0, data_train.shape[0]):
-            for j in range(0, data_train.shape[1]):
-                data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
-
-        #data_2_subs.shape
-
-        #Common Average Reference
-        for j in range(0, data_2_subs.shape[0]):
-            car=np.zeros((data_2_subs.shape[2],))
-            for i in range(0, data_2_subs.shape[1]):
-                car= car + data_2_subs[j,i,:]
-
-            car=car/data_2_subs.shape[1]
-            #car.shape
-
-            for k in range(0, data_2_subs.shape[1]):
-                data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-
-        #Standard Scaler
-
-        for j in range(0, data_2_subs.shape[0]):
-            #kr=data_2_subs[j,:,:]
-            kr=data_2_subs[j,:,:]
-            if(args.scaler=="Standard"):
-                scaler=StandardScaler().fit(kr.T)
-            elif(args.scaler=="Minmax"):
-                scaler=MinMaxScaler().fit(kr.T)
-            data_2_subs[j,:,:]=scaler.transform(kr.T).T
+                
+                
+            #scaler = StandardScaler()
+            #param_ls=[]
+            mu_l={}
+            std_l={}
+            for j in range(data_2_subs.shape[1]):
+                mu_l[str(j)]=[]
+                std_l[str(j)]=[]
+                
+            for i in range(data_2_subs.shape[0]):
+                for j in range(data_2_subs.shape[1]):
+                    mu=np.mean(data_2_subs[i,j,:])
+                    std=np.std(data_2_subs[i,j,:])
+                    mu_l[str(j)].append(mu)
+                    std_l[str(j)].append(std)
+            
+            for j in range(data_2_subs.shape[1]):
+                mu_l[str(j)]=sum(mu_l[str(j)])/len(mu_l[str(j)])
+                std_l[str(j)]=sum(std_l[str(j)])/len(std_l[str(j)])
+                
+            for i in range(data_2_subs.shape[0]):
+                for j in range(data_2_subs.shape[1]):
+                    data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
+                
+            for i in range(data_2_subs_t.shape[0]):
+                for j in range(data_2_subs_t.shape[1]):
+                    data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
 
 
 
         # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
         # makes it incompatible in some cases where uniform input is desired.
-
+        X_Train = np.moveaxis(X_Train, 2, 1)
+        X_Test = np.moveaxis(X_Test, 2, 1)
         nb_trials = X_Train.shape[0]
 
             
@@ -394,7 +411,23 @@ def encode(args):
 
 
             if(args.preprocess==1):
-            #subsampling by 4 
+                data_2_subs=X_Tr
+                '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+                for i in range(0, data_train.shape[0]):
+                    for j in range(0, data_train.shape[1]):
+                        data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+
+                #data_2_subs.shape
+                for j in range(0, X_Tr.shape[0]):
+                    car=np.zeros((data_2_subs.shape[2],))
+                    for i in range(0, X_Tr.shape[1]):
+                        car= car + data_2_subs[j,i,:]
+                    car=car/X_Tr.shape[1]
+                    #car.shape
+                    for k in range(0, X_Tr.shape[1]):
+                        data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+                            
+                #subsampling by 4 
                 data_2_subs_t=X_Test
                 '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
                 for i in range(0, data_test.shape[0]):
@@ -403,65 +436,63 @@ def encode(args):
 
                 #data_2_subs_t.shape
                 #Common Average Reference
+                #if(c_ref==True):
                 for j in range(0, data_2_subs_t.shape[0]):
                     car=np.zeros((data_2_subs_t.shape[2],))
                     for i in range(0, data_2_subs_t.shape[1]):
                         car= car + data_2_subs_t[j,i,:]
-
                     car=car/data_2_subs_t.shape[1]
                     #car.shape
-
                     for k in range(0, data_2_subs_t.shape[1]):
                         data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
                 #Standard Scaler
 
-                for j in range(0, data_2_subs_t.shape[0]):
-                    kr=data_2_subs_t[j,:,:]
-                    if(args.scaler=="Standard"):
-                        scaler=StandardScaler().fit(kr.T)
-                    elif(args.scaler=="Minmax"):
-                        scaler=MinMaxScaler().fit(kr.T)
-                    data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
-
-
-
-                data_2_subs=X_Tr
-                '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-                for i in range(0, data_train.shape[0]):
-                    for j in range(0, data_train.shape[1]):
-                        data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
-
-                #data_2_subs.shape
-
-                #Common Average Reference
-                for j in range(0, data_2_subs.shape[0]):
-                    car=np.zeros((data_2_subs.shape[2],))
-                    for i in range(0, data_2_subs.shape[1]):
-                        car= car + data_2_subs[j,i,:]
-
-                    car=car/data_2_subs.shape[1]
-                    #car.shape
-
-                    for k in range(0, data_2_subs.shape[1]):
-                        data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-
                 #Standard Scaler
 
-                for j in range(0, data_2_subs.shape[0]):
-                    #kr=data_2_subs[j,:,:]
+                '''for j in range(0, data_train.shape[0]):
                     kr=data_2_subs[j,:,:]
-                    if(args.scaler=="Standard"):
-                        scaler=StandardScaler().fit(kr.T)
-                    elif(args.scaler=="Minmax"):
-                        scaler=MinMaxScaler().fit(kr.T)
-                    data_2_subs[j,:,:]=scaler.transform(kr.T).T
+                    kr=data_2_subs[j,:,:]
+                    
+                    scaler=StandardScaler().fit(kr.T)
+                    data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+                    
+
+                    
+                    
+                #scaler = StandardScaler()
+                #param_ls=[]
+                mu_l={}
+                std_l={}
+                for j in range(data_2_subs.shape[1]):
+                    mu_l[str(j)]=[]
+                    std_l[str(j)]=[]
+                    
+                for i in range(data_2_subs.shape[0]):
+                    for j in range(data_2_subs.shape[1]):
+                        mu=np.mean(data_2_subs[i,j,:])
+                        std=np.std(data_2_subs[i,j,:])
+                        mu_l[str(j)].append(mu)
+                        std_l[str(j)].append(std)
+                
+                for j in range(data_2_subs.shape[1]):
+                    mu_l[str(j)]=sum(mu_l[str(j)])/len(mu_l[str(j)])
+                    std_l[str(j)]=sum(std_l[str(j)])/len(std_l[str(j)])
+                    
+                for i in range(data_2_subs.shape[0]):
+                    for j in range(data_2_subs.shape[1]):
+                        data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
+                    
+                for i in range(data_2_subs_t.shape[0]):
+                    for j in range(data_2_subs_t.shape[1]):
+                        data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
 
 
 
             # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
             # makes it incompatible in some cases where uniform input is desired.
-
+            X_Tr = np.moveaxis(X_Tr, 2, 1)
+            X_Test = np.moveaxis(X_Test, 2, 1)
             nb_trials = X_Tr.shape[0]
 
                 

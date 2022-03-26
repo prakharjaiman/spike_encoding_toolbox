@@ -39,30 +39,30 @@ if __name__ == '__main__':
   for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.preprocess,args.niter,args.scaler in product(*param_values):
     args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
     svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb,acc,sel,gen,nfeat,rf_score_individual_input = evaluate_encoder(args)
-    for n in range(args.gen+1):
-      df = df.append({ "dataset":args.dataset,
-              "fold":args.fold,
-              "encode_thr_up":args.encode_thr_up,
-              "encode_thr_dn":args.encode_thr_dn,
-              "tstep": args.tstep,
-              "encode_refractory": args.encode_refractory,
-              "encode_interpfact": args.encode_interpfact,			 
-                      "firing_rate":firing_rate,
-                      "svm_score":svm_score,
-                        "rf_score":rf_score,
-                      "svm_score_baseline":svm_score_baseline,
-              "svm_score_comb":svm_score_comb,
-              "rf_score_comb":rf_score_comb,
-              "gen_accuracy":gen,
-              "generation":n,
-              "selected_features":sel,
-              "genetic_final_accuracy":acc,
-              "n_selected_features":nfeat,
-              "individual_rf":rf_score_individual_input,
-              "niter":args.niter,
-              "preprocess":args.preprocess,
-              "scaler":args.scaler
-                      },ignore_index=True)
+    #for n in range(args.gen+1):
+    df = df.append({ "dataset":args.dataset,
+            "fold":args.fold,
+            "encode_thr_up":args.encode_thr_up,
+            "encode_thr_dn":args.encode_thr_dn,
+            "tstep": args.tstep,
+            "encode_refractory": args.encode_refractory,
+            "encode_interpfact": args.encode_interpfact,			 
+                    "firing_rate":firing_rate,
+                    "svm_score":svm_score,
+                      "rf_score":rf_score,
+                    "svm_score_baseline":svm_score_baseline,
+            "svm_score_comb":svm_score_comb,
+            "rf_score_comb":rf_score_comb,
+            "gen_accuracy":gen,
+            "generation":n,
+            "selected_features":sel,
+            "genetic_final_accuracy":acc,
+            "n_selected_features":nfeat,
+            "individual_rf":rf_score_individual_input,
+            "niter":args.niter,
+            "preprocess":args.preprocess,
+            "scaler":args.scaler
+                    },ignore_index=True)
 
 
 

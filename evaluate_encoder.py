@@ -224,7 +224,7 @@ def evaluate_encoder(args):
             #print("THESHAPE OF X_input_train"+len(X_input_train))
             y_pred_rf_w = clf.predict(X_temp_input_test)
             rf_score_individual_input.append(metrics.accuracy_score(Y_input_test,y_pred_rf_w))
-
+        rf_score_individual_input_list.append(rf_score_individual_input)
 
         
         '''cls_auto = autosklearn.classification.AutoSklearnClassifier()

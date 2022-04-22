@@ -21,7 +21,7 @@ if __name__ == '__main__':
   seed = 50
   random.seed(seed)
   np.random.seed(seed)
-  df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[],"gen_accuracy":[],"selected_features":[],"genetic_final_accuracy":[],"n_selected_features":[], "individual_rf":[], "niter":[],"preprocess":[],"scaler":[]})
+  df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"maxft":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[],"gen_accuracy":[],"selected_features":[],"genetic_final_accuracy":[],"n_selected_features":[], "individual_rf":[], "niter":[],"preprocess":[],"scaler":[]})
 
   parameters = dict(
 		dataset = ["bci3"]
@@ -31,12 +31,13 @@ if __name__ == '__main__':
 		,interpfact = [1]
 		,refractory = [1]
     ,gen=[2]
+    ,maxft=[16]
     ,preprocess=[1]
     ,niter=[100]
     ,scaler=["Standard"]
     )
   param_values = [v for v in parameters.values()] 
-  for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.preprocess,args.niter,args.scaler in product(*param_values):
+  for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler in product(*param_values):
     args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
     svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb,acc,sel,gen,nfeat,rf_score_individual_input = evaluate_encoder(args)
     #for n in range(args.gen+1):
@@ -45,6 +46,7 @@ if __name__ == '__main__':
             "encode_thr_up":args.encode_thr_up,
             "encode_thr_dn":args.encode_thr_dn,
             "tstep": args.tstep,
+	    "maxft": args.maxft
             "encode_refractory": args.encode_refractory,
             "encode_interpfact": args.encode_interpfact,			 
                     "firing_rate":firing_rate,

@@ -118,6 +118,9 @@ def args():
     parser.add_argument("--kfold",default=3,type=int,
         help="number of folds in kfold",
     )
+    parser.add_argument("--maxft",default=5,type=int,
+        help="upper limit on number of features to be taken",
+    )
 
     parser.add_argument('--log_file_path', default=None, 
                         help='Path for log file')

@@ -46,7 +46,7 @@ if __name__ == '__main__':
             "encode_thr_up":args.encode_thr_up,
             "encode_thr_dn":args.encode_thr_dn,
             "tstep": args.tstep,
-	    "maxft": args.maxft
+	    "maxft": args.maxft,
             "encode_refractory": args.encode_refractory,
             "encode_interpfact": args.encode_interpfact,			 
                     "firing_rate":firing_rate,

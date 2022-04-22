@@ -146,8 +146,10 @@ def evaluate_encoder(args):
         prediction = clf.predict(X_input_test)
         rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
 
+        #genetic
         gen={}
         sel=[]
+        #making dictionary to store the accuracy for each generation
         for k in range(args.gen+1):
             gen[str(k)]=[]
         estimator = RandomForestClassifier()

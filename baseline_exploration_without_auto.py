@@ -21,7 +21,7 @@ if __name__ == '__main__':
   seed = 50
   random.seed(seed)
   np.random.seed(seed)
-  df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[],"gen_accuracy":[],"generation":[],"selected_features":[],"genetic_final_accuracy":[],"n_selected_features":[], "individual_rf":[], "niter":[],"preprocess":[],"scaler":[]})
+  df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[],"gen_accuracy":[],"selected_features":[],"genetic_final_accuracy":[],"n_selected_features":[], "individual_rf":[], "niter":[],"preprocess":[],"scaler":[]})
 
   parameters = dict(
 		dataset = ["bci3"]

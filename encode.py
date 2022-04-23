@@ -176,6 +176,7 @@ def encode(args):
 
         data = np.load(data_dir)
         X_Train = data['X_Train']
+        #Shape of X_Train is (278, 64, 3000)
         Y_Train = data['Y_Train']
 
         X_Test = data['X_Test']
@@ -282,6 +283,7 @@ def encode(args):
         # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
         # makes it incompatible in some cases where uniform input is desired.
         X_Train = np.moveaxis(X_Train, 2, 1)
+        #Shape now is (278, 3000, 64)
         X_Test = np.moveaxis(X_Test, 2, 1)
         nb_trials = X_Train.shape[0]
 
@@ -289,6 +291,7 @@ def encode(args):
         # print(len(X))
         print("Number of training samples in dataset:")
         print(len(X_Train))
+        #len is 278
         print(len(Y_Train))
         # print("Class labels:")
         # print(list(set(Y_Train)))

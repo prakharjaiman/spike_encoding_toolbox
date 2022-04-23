@@ -79,6 +79,7 @@ def evaluate_encoder(args):
                                                         tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
         print("Number of Train samples : ")
         print(len(X_input_train))
+        print(X_input_train.shape)
 
         
         # Testing

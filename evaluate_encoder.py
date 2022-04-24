@@ -58,12 +58,15 @@ def evaluate_encoder(args):
         #Training
         spike_times_up = spike_times_train_up_list[0]
         spike_times_dn = spike_times_train_dn_list[0]
-        labels = Y_Train_list[0]
-        label_list = []
+        
 
         f_split=args.f_split
         #Do an iteration for all of the f_split divides
         for h in range(f_split):
+            spike_rate_array_all_input_train = np.ones((nbInputs, nbtimepoints)) * -1 
+            nbtimepoints = int(args.duration / args.tstep)
+            labels = Y_Train_list[0]
+            label_list = []
             for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
                 # print(iteration)
                 times, indices = convert_data_add_format(sample_time_up, sample_time_down)
@@ -72,8 +75,6 @@ def evaluate_encoder(args):
                                                                 duration=args.tlast, tstep=args.tstep, nbneurons=nbInputs)
 
                 spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
-                print("SHAPE 0\n")
-                print(spike_rate_array_all_input_train.shape)
                 label_list.append(np.array(labels[iteration]))
                 gc.collect()
             print("SHAPE 1\n")
@@ -84,6 +85,7 @@ def evaluate_encoder(args):
 
             X_input_train, Y_input_train = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_train, label_array=label_list,
                                                             tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+            X_input_train=np.array(X_input_train)
 
             if h==0:
                 X_input_train_final=X_input_train
@@ -105,6 +107,9 @@ def evaluate_encoder(args):
         label_list = []
         #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
         for h in range(f_split):
+            spike_rate_array_all_input_test = np.ones((nbInputs, nbtimepoints)) * -1
+            labels = Y_Test_list[0]
+            label_list = []
             for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
                 #TODO: do a TQDM progress bar here
                 # print(iteration)
@@ -123,6 +128,7 @@ def evaluate_encoder(args):
             X_input_test, Y_input_test = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_test, label_array=label_list,
                                                             tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
 
+            X_input_test=np.array(X_input_test)
             if h==0:
                 #X_input_train_final=X_input_train
                 X_input_test_final=X_input_test

@@ -61,7 +61,7 @@ def evaluate_encoder(args):
         labels = Y_Train_list[0]
         label_list = []
 
-
+        f_split=args.f_split
         #Do an iteration for all of the f_split divides
         for h in range(f_split):
             for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):

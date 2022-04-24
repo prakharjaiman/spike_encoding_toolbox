@@ -328,7 +328,7 @@ def evaluate_encoder(args):
         )
 
 
-        return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat, rf_score_individual_input# auto_score
+        return svm_score_input,rf_score_input,avg_spike_rate_list, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat, rf_score_individual_input# auto_score
 
     else:
         #spike_times_train_up, spike_times_train_dn, spike_times_test_up, spike_times_test_dn, X_Train,X_Test, Y_Train,Y_Test,avg_spike_rate = encode(args)

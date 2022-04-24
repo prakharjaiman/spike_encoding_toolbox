@@ -83,7 +83,7 @@ def evaluate_encoder(args):
             #Assume shape of X_input_train to be (trials,X) -> (278, X)
             print("Number of Train samples : ")
             print(len(X_input_train))
-            print(X_input_train.shape)
+            print(X_input_train[0].shape)
 
             
             # Testing

@@ -72,13 +72,25 @@ def evaluate_encoder(args):
                                                                 duration=args.tlast, tstep=args.tstep, nbneurons=nbInputs)
 
                 spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
+                print("SHAPE 0\n")
+                print(spike_rate_array_all_input_train.shape)
                 label_list.append(np.array(labels[iteration]))
                 gc.collect()
-
+            print("SHAPE 1\n")
+            print(spike_rate_array_all_input_train.shape)
             spike_rate_array_all_input_train = spike_rate_array_all_input_train[:,:,1:]
+            print("SHAPE 2\n")
+            print(spike_rate_array_all_input_train.shape)
 
             X_input_train, Y_input_train = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_train, label_array=label_list,
                                                             tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+
+            if h==0:
+                X_input_train_final=X_input_train
+                #X_input_test_final=X_input_test
+            else:
+                X_input_train_final=np.hstack((X_input_train_final, X_input_train))
+                #X_input_test_final=np.hstack((X_input_test_final, X_input_test))
 
             #Assume shape of X_input_train to be (trials,X) -> (278, X)
             print("Number of Train samples : ")
@@ -86,12 +98,13 @@ def evaluate_encoder(args):
             print(X_input_train[0].shape)
 
             
-            # Testing
-            spike_times_up = spike_times_test_up_list[0]
-            spike_times_dn = spike_times_test_dn_list[0]
-            labels = Y_Test_list[0]
-            label_list = []
-            #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
+        # Testing
+        spike_times_up = spike_times_test_up_list[0]
+        spike_times_dn = spike_times_test_dn_list[0]
+        labels = Y_Test_list[0]
+        label_list = []
+        #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
+        for h in range(f_split):
             for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
                 #TODO: do a TQDM progress bar here
                 # print(iteration)
@@ -109,13 +122,15 @@ def evaluate_encoder(args):
             
             X_input_test, Y_input_test = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_test, label_array=label_list,
                                                             tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
-            
+
             if h==0:
-                X_input_train_final=X_input_train
+                #X_input_train_final=X_input_train
                 X_input_test_final=X_input_test
             else:
-                X_input_train_final=np.hstack((X_input_train_final, X_input_train))
+                #X_input_train_final=np.hstack((X_input_train_final, X_input_train))
                 X_input_test_final=np.hstack((X_input_test_final, X_input_test))
+            
+            
 
             
 

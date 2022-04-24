@@ -45,11 +45,10 @@ def evaluate_encoder(args):
     random.seed(seed)
     np.random.seed(seed)
     print(args.__dict__)
-
     spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list = encode(args)
+    print("encoding done")
     svm_score_input_list,rf_score_input_list, svm_score_baseline_list, svm_score_comb_list, rf_score_comb_list, acc_list, sel_list, gen_list, nfeat_list, rf_score_individual_input_list=[],[],[],[],[],[],[],[],[],[]
     if args.dataset=="bci3":
-
         nbtimepoints = int(args.duration / args.tstep)
 
         spike_rate_array_all_input_train = np.ones((nbInputs, nbtimepoints)) * -1  # Dummy spike counts. Would be discarded in last lines
@@ -62,50 +61,65 @@ def evaluate_encoder(args):
         labels = Y_Train_list[0]
         label_list = []
 
-        for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
-            # print(iteration)
-            times, indices = convert_data_add_format(sample_time_up, sample_time_down)
-            rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
-                                                            time_array=np.array(times),
-                                                            duration=args.tlast, tstep=args.tstep, nbneurons=nbInputs)
 
-            spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
-            label_list.append(np.array(labels[iteration]))
-            gc.collect()
-
-        spike_rate_array_all_input_train = spike_rate_array_all_input_train[:,:,1:]
-
-        X_input_train, Y_input_train = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_train, label_array=label_list,
-                                                        tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
-        print("Number of Train samples : ")
-        print(len(X_input_train))
-        print(X_input_train.shape)
-
-        
-        # Testing
-        spike_times_up = spike_times_test_up_list[0]
-        spike_times_dn = spike_times_test_dn_list[0]
-        labels = Y_Test_list[0]
-        label_list = []
-        #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
-        for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
-            #TODO: do a TQDM progress bar here
-            # print(iteration)
-            times, indices = convert_data_add_format(sample_time_up, sample_time_down)
-
-            rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
+        #Do an iteration for all of the f_split divides
+        for h in range(f_split):
+            for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
+                # print(iteration)
+                times, indices = convert_data_add_format(sample_time_up, sample_time_down)
+                rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
                                                                 time_array=np.array(times),
-                                                                duration=3000, tstep=args.tstep, nbneurons=nbInputs)
+                                                                duration=args.tlast, tstep=args.tstep, nbneurons=nbInputs)
 
-            spike_rate_array_all_input_test = np.dstack((spike_rate_array_all_input_test, rate_array_input))
-            label_list.append(np.array(labels[iteration]))
-            gc.collect()
+                spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
+                label_list.append(np.array(labels[iteration]))
+                gc.collect()
 
-        spike_rate_array_all_input_test=spike_rate_array_all_input_test[:,:,1:]
-        
-        X_input_test, Y_input_test = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_test, label_array=label_list,
-                                                        tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
-        
+            spike_rate_array_all_input_train = spike_rate_array_all_input_train[:,:,1:]
+
+            X_input_train, Y_input_train = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_train, label_array=label_list,
+                                                            tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+
+            #Assume shape of X_input_train to be (trials,X) -> (278, X)
+            print("Number of Train samples : ")
+            print(len(X_input_train))
+            print(X_input_train.shape)
+
+            
+            # Testing
+            spike_times_up = spike_times_test_up_list[0]
+            spike_times_dn = spike_times_test_dn_list[0]
+            labels = Y_Test_list[0]
+            label_list = []
+            #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
+            for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
+                #TODO: do a TQDM progress bar here
+                # print(iteration)
+                times, indices = convert_data_add_format(sample_time_up, sample_time_down)
+
+                rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
+                                                                    time_array=np.array(times),
+                                                                    duration=3000, tstep=args.tstep, nbneurons=nbInputs)
+
+                spike_rate_array_all_input_test = np.dstack((spike_rate_array_all_input_test, rate_array_input))
+                label_list.append(np.array(labels[iteration]))
+                gc.collect()
+
+            spike_rate_array_all_input_test=spike_rate_array_all_input_test[:,:,1:]
+            
+            X_input_test, Y_input_test = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_test, label_array=label_list,
+                                                            tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+            
+            if h==0:
+                X_input_train_final=X_input_train
+                X_input_test_final=X_input_test
+            else:
+                X_input_train_final=np.hstack((X_input_train_final, X_input_train))
+                X_input_test_final=np.hstack((X_input_test_final, X_input_test))
+
+            
+
+
         print("Number of Test samples : ")
         print(len(X_input_test))
 
@@ -130,8 +144,8 @@ def evaluate_encoder(args):
         svma=svm.SVC()
         distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
         clf = RandomizedSearchCV(svma, distributions, random_state=0)
-        clf.fit(X_input_train, Y_input_train)
-        prediction = clf.predict(X_input_test)
+        clf.fit(X_input_train_final, Y_input_train)
+        prediction = clf.predict(X_input_test_final)
         svm_score_input=metrics.accuracy_score(Y_input_test,prediction)
         print("ONEODNE")
 
@@ -143,8 +157,8 @@ def evaluate_encoder(args):
         distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
         #print("THESHAPE OF X_input_train"+len(X_input_train))
-        clf.fit(X_input_train, Y_input_train)
-        prediction = clf.predict(X_input_test)
+        clf.fit(X_input_train_final, Y_input_train)
+        prediction = clf.predict(X_input_test_final)
         rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
 
         #genetic
@@ -170,8 +184,8 @@ def evaluate_encoder(args):
         n_gen_no_change=10,
         caching=True,
         n_jobs=100,)
-        selector = selector.fit(X_input_train, Y_input_train)
-        acc=selector.score(X_input_test, Y_input_test)
+        selector = selector.fit(X_input_train_final, Y_input_train)
+        acc=selector.score(X_input_test_final, Y_input_test)
         tempo=np.where(selector.support_.astype(int)==1)[0]
         sel=tempo
         for k in range(args.gen+1):
@@ -179,20 +193,20 @@ def evaluate_encoder(args):
         nfeat=sel.shape[0]
 
         print("THIS")
-        X_input_train_n = np.array(X_input_train)
-        for i in range(0,len(X_input_train)):
+        X_input_train_n = np.array(X_input_train_final)
+        for i in range(0,len(X_input_train_final)):
             if i==0:
                 X_input_train_n=X_input_train[0]
             else:
-                X_input_train_n=np.vstack((X_input_train_n, X_input_train[i]))
+                X_input_train_n=np.vstack((X_input_train_n, X_input_train_final[i]))
         print(X_input_train_n.shape)
         
-        X_input_test_n = np.array(X_input_test)
-        for i in range(0,len(X_input_test)):
+        X_input_test_n = np.array(X_input_test_final)
+        for i in range(0,len(X_input_test_final)):
             if i==0:
-                X_input_test_n=X_input_test[0]
+                X_input_test_n=X_input_test_final[0]
             else:
-                X_input_test_n=np.vstack((X_input_test_n, X_input_test[i]))
+                X_input_test_n=np.vstack((X_input_test_n, X_input_test_final[i]))
     
 
         X_input_train_comb=np.hstack((X_input_train_n, X_train))
@@ -214,42 +228,45 @@ def evaluate_encoder(args):
         prediction = clf.predict(X_input_test_comb)
         rf_score_comb=metrics.accuracy_score(Y_input_test,prediction)
 
-        rf_score_individual_input=[]
-        for i in range(X_input_train_n.shape[1]):
-            X_temp_input=X_input_train_n[:,i]
-            X_temp_input=np.reshape(X_temp_input, (X_input_train_n.shape[0],1))
-            X_temp_input_test=X_input_test_n[:,i]
-            X_temp_input_test=np.reshape(X_temp_input_test, (X_input_test_n.shape[0],1))
-            rf = RandomForestClassifier()
-            distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=100,n_jobs=-1)
-            clf.fit(X_temp_input, Y_input_train)
-            #print("THESHAPE OF X_input_train"+len(X_input_train))
-            y_pred_rf_w = clf.predict(X_temp_input_test)
-            rf_score_individual_input.append(metrics.accuracy_score(Y_input_test,y_pred_rf_w))
-        rf_score_individual_input_list.append(rf_score_individual_input)
+        if args.calc_individual==1:
+            rf_score_individual_input=[]
+            for i in range(X_input_train_n.shape[1]):
+                X_temp_input=X_input_train_n[:,i]
+                X_temp_input=np.reshape(X_temp_input, (X_input_train_n.shape[0],1))
+                X_temp_input_test=X_input_test_n[:,i]
+                X_temp_input_test=np.reshape(X_temp_input_test, (X_input_test_n.shape[0],1))
+                rf = RandomForestClassifier()
+                distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=100,n_jobs=-1)
+                clf.fit(X_temp_input, Y_input_train)
+                #print("THESHAPE OF X_input_train"+len(X_input_train))
+                y_pred_rf_w = clf.predict(X_temp_input_test)
+                rf_score_individual_input.append(metrics.accuracy_score(Y_input_test,y_pred_rf_w))
+            rf_score_individual_input_list.append(rf_score_individual_input)
 
-        
-        '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
-        cls_auto.fit(X_input_train_comb, Y_input_train)
-        predictions = cls_auto.predict(X_input_test_comb)
-        from sklearn import metrics
-        auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
+        else:
+            rf_score_individual_input_list=["NOT CALCULATED"]
+            
+            '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
+            cls_auto.fit(X_input_train_comb, Y_input_train)
+            predictions = cls_auto.predict(X_input_test_comb)
+            from sklearn import metrics
+            auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
 
 
-        '''pwd = os.getcwd()
-        plot_dir = pwd + '/plots/'
-        plt.rcParams.update({'font.size': 16})
-        #Confusion matrix
-        predictions = clf_input.predict(X_input_test)
-        ax = skplt.metrics.plot_confusion_matrix(Y_input_test, predictions, normalize=True)
-        plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'confusion'+'.svg')
-        plt.clf()
-        #ROC curve
-        predicted_probas = clf_input.predict_proba(X_input_test)
-        ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
-        plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
-        plt.clf()'''
+            '''pwd = os.getcwd()
+            plot_dir = pwd + '/plots/'
+            plt.rcParams.update({'font.size': 16})
+            #Confusion matrix
+            predictions = clf_input.predict(X_input_test)
+            ax = skplt.metrics.plot_confusion_matrix(Y_input_test, predictions, normalize=True)
+            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'confusion'+'.svg')
+            plt.clf()
+            #ROC curve
+            predicted_probas = clf_input.predict_proba(X_input_test)
+            ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
+            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
+            plt.clf()'''
 
 
         '''

@@ -303,51 +303,69 @@ def encode(args):
         refractory_period = args.encode_refractory  # in ms
         th_up = args.encode_thr_up
         th_dn = args.encode_thr_dn
+        f_split=args.f_split
+        #no. of parts that the 3000 segment would be split in. For eg: if f_split=2 then parts is 0,1500 ; 1500,3000
+        parts=X_Train.shape[1]/f_split
+        #make a list that stores the partitioned array. For eg: X_Train_s[0].shape:(278,1500,64)
+        X_Train_s=[]
+        X_Test_s=[]
+        for h in range(f_split):
+            X_Train_s.append(X_Train[:,h*int(parts):(h+1)*int(parts),:])
+            X_Test_s.append(X_Test[:,h*int(parts):(h+1)*int(parts),:])
 
-
+        spike_times_train_up_l=[]
+        spike_times_train_dn_l=[]
         # Generate the  data
-        X=X_Train
-        Y=Y_Train
-        spike_times_train_up = []
-        spike_times_train_dn = []
-        for i in range(len(X)):
-            spk_up, spk_dn = gen_spike_time(
-                time_series_data=X[i],
-                interpfact=interpfact,
-                fs=fs,
-                th_up=th_up,
-                th_dn=th_dn,
-                refractory_period=refractory_period,
-            )
-            spike_times_train_up.append(spk_up)
-            spike_times_train_dn.append(spk_dn)
-        spike_times_train_up_list.append(spike_times_train_up)
-        spike_times_train_dn_list.append(spike_times_train_dn)
+        for h in range(f_split):
+            X=X_Train_s[h]
+            Y=Y_Train
+            spike_times_train_up = []
+            spike_times_train_dn = []
+            for i in range(len(X)):
+                spk_up, spk_dn = gen_spike_time(
+                    time_series_data=X[i],
+                    interpfact=interpfact,
+                    fs=fs,
+                    th_up=th_up,
+                    th_dn=th_dn,
+                    refractory_period=refractory_period,
+                )
+                spike_times_train_up.append(spk_up)
+                spike_times_train_dn.append(spk_dn)
+            spike_times_train_up_l.append(spike_times_train_up)
+            spike_times_train_dn_l.append(spike_times_train_dn)
+        spike_times_train_up_list.append(spike_times_train_up_l)
+        spike_times_train_dn_list.append(spike_times_train_dn_l)
 
         
-
+        #ASK NIKHIL HERE
         rate_up = gen_spike_rate(spike_times_train_up)
         rate_dn = gen_spike_rate(spike_times_train_dn)
         avg_spike_rate = (rate_up+rate_dn)/2
         print("Average spiking rate")
         print(avg_spike_rate)
 
-            # Generate the  data
-        X=X_Test
-        Y=Y_Test
-        spike_times_test_up = []
-        spike_times_test_dn = []
-        for i in range(len(X)):
-            spk_up, spk_dn = gen_spike_time(
-                time_series_data=X[i],
-                interpfact=interpfact,
-                fs=fs,
-                th_up=th_up,
-                th_dn=th_dn,
-                refractory_period=refractory_period,
-            )
-            spike_times_test_up.append(spk_up)
-            spike_times_test_dn.append(spk_dn)
+        # Generate the  data
+        spike_times_test_up_l=[]
+        spike_times_test_dn_l=[]
+        for h in range(f_split):
+            X=X_Test_s[h]
+            Y=Y_Test
+            spike_times_test_up = []
+            spike_times_test_dn = []
+            for i in range(len(X)):
+                spk_up, spk_dn = gen_spike_time(
+                    time_series_data=X[i],
+                    interpfact=interpfact,
+                    fs=fs,
+                    th_up=th_up,
+                    th_dn=th_dn,
+                    refractory_period=refractory_period,
+                )
+                spike_times_test_up.append(spk_up)
+                spike_times_test_dn.append(spk_dn)
+            spike_times_test_up_l.append(spike_times_test_up)
+            spike_times_test_dn_l.append(spike_times_test_dn)
         spike_times_test_up_list.append(spike_times_test_up)
         spike_times_test_dn_list.append(spike_times_test_dn)
         

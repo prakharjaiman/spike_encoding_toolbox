@@ -107,6 +107,11 @@ def args():
                     help='Fold for train/test'
                           'e.g. 1, 2, 3 ')
     
+    
+    parser.add_argument('--f_split', default=2, type=int,
+                    help='Splitting for concatenation of features'
+                          'e.g. 1, 2, 3 ')
+    
     parser.add_argument('--calc_individual', default=0, type=int,
                     help='calculate individual electrode score'
                           'e.g. 1, 2, 3 ')

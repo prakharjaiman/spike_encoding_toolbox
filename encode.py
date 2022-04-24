@@ -366,8 +366,8 @@ def encode(args):
                 spike_times_test_dn.append(spk_dn)
             spike_times_test_up_l.append(spike_times_test_up)
             spike_times_test_dn_l.append(spike_times_test_dn)
-        spike_times_test_up_list.append(spike_times_test_up)
-        spike_times_test_dn_list.append(spike_times_test_dn)
+        spike_times_test_up_list.append(spike_times_test_up_l)
+        spike_times_test_dn_list.append(spike_times_test_dn_l)
         
 
 

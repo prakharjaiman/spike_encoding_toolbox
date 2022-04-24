@@ -217,7 +217,7 @@ def evaluate_encoder(args):
         X_input_train_n = np.array(X_input_train_final)
         for i in range(0,len(X_input_train_final)):
             if i==0:
-                X_input_train_n=X_input_train[0]
+                X_input_train_n=X_input_train_final[0]
             else:
                 X_input_train_n=np.vstack((X_input_train_n, X_input_train_final[i]))
         print(X_input_train_n.shape)

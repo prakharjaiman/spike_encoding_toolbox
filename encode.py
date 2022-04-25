@@ -198,44 +198,44 @@ def encode(args):
         #X_Test = np.moveaxis(X_Test, 2, 1)
         Y_Test = np.array(Y_Test)
 
-        if(args.preprocess==1):
+        
         #subsampling by 4 
-            data_2_subs=X_Train
-            '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-            for i in range(0, data_train.shape[0]):
-                for j in range(0, data_train.shape[1]):
-                    data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+        data_2_subs=X_Train
+        '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
+        for i in range(0, data_train.shape[0]):
+            for j in range(0, data_train.shape[1]):
+                data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
 
-            #data_2_subs.shape
-            
-            
-            for j in range(0, X_Train.shape[0]):
-                car=np.zeros((data_2_subs.shape[2],))
-                for i in range(0, X_Train.shape[1]):
-                    car= car + data_2_subs[j,i,:]
-                car=car/X_Train.shape[1]
-                #car.shape
-                for k in range(0, X_Train.shape[1]):
-                    data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-                        
-            #subsampling by 4 
-            data_2_subs_t=X_Test
-            '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-            for i in range(0, data_test.shape[0]):
-                for j in range(0, data_test.shape[1]):
-                    data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+        #data_2_subs.shape
+        
+        
+        for j in range(0, X_Train.shape[0]):
+            car=np.zeros((data_2_subs.shape[2],))
+            for i in range(0, X_Train.shape[1]):
+                car= car + data_2_subs[j,i,:]
+            car=car/X_Train.shape[1]
+            #car.shape
+            for k in range(0, X_Train.shape[1]):
+                data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+                    
+        #subsampling by 4 
+        data_2_subs_t=X_Test
+        '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+        for i in range(0, data_test.shape[0]):
+            for j in range(0, data_test.shape[1]):
+                data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
 
-            #data_2_subs_t.shape
-            #Common Average Reference
-            #if(c_ref==True):
-            for j in range(0, data_2_subs_t.shape[0]):
-                car=np.zeros((data_2_subs_t.shape[2],))
-                for i in range(0, data_2_subs_t.shape[1]):
-                    car= car + data_2_subs_t[j,i,:]
-                car=car/data_2_subs_t.shape[1]
-                #car.shape
-                for k in range(0, data_2_subs_t.shape[1]):
-                    data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+        #data_2_subs_t.shape
+        #Common Average Reference
+        #if(c_ref==True):
+        for j in range(0, data_2_subs_t.shape[0]):
+            car=np.zeros((data_2_subs_t.shape[2],))
+            for i in range(0, data_2_subs_t.shape[1]):
+                car= car + data_2_subs_t[j,i,:]
+            car=car/data_2_subs_t.shape[1]
+            #car.shape
+            for k in range(0, data_2_subs_t.shape[1]):
+                data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
             #Standard Scaler
 
@@ -250,7 +250,7 @@ def encode(args):
                 
 
                 
-                
+        if(args.preprocess==1):
             #scaler = StandardScaler()
             #param_ls=[]
             mu_l={}
@@ -282,10 +282,10 @@ def encode(args):
 
         # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
         # makes it incompatible in some cases where uniform input is desired.
-        X_Train = np.moveaxis(X_Train, 2, 1)
+        data_2_subs = np.moveaxis(data_2_subs, 2, 1)
         #Shape now is (278, 3000, 64)
-        X_Test = np.moveaxis(X_Test, 2, 1)
-        nb_trials = X_Train.shape[0]
+        data_2_subs_t = np.moveaxis(data_2_subs_t, 2, 1)
+        #nb_trials = X_Train.shape[0]
 
             
         # print(len(X))
@@ -305,13 +305,13 @@ def encode(args):
         th_dn = args.encode_thr_dn
         f_split=args.f_split
         #no. of parts that the 3000 segment would be split in. For eg: if f_split=2 then parts is 0,1500 ; 1500,3000
-        parts=X_Train.shape[1]/f_split
+        parts=data_2_subs.shape[1]/f_split
         #make a list that stores the partitioned array. For eg: X_Train_s[0].shape:(278,1500,64)
         X_Train_s=[]
         X_Test_s=[]
         for h in range(f_split):
-            X_Train_s.append(X_Train[:,h*int(parts):(h+1)*int(parts),:])
-            X_Test_s.append(X_Test[:,h*int(parts):(h+1)*int(parts),:])
+            X_Train_s.append(data_2_subs[:,h*int(parts):(h+1)*int(parts),:])
+            X_Test_s.append(data_2_subs_t[:,h*int(parts):(h+1)*int(parts),:])
 
         spike_times_train_up_l=[]
         spike_times_train_dn_l=[]

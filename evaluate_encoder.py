@@ -502,7 +502,7 @@ def evaluate_encoder(args):
             rf_score_comb=metrics.accuracy_score(Y_input_test,prediction)
             rf_score_comb_list.append(rf_score_comb)
 
-            rf_score_individual_input=[]
+            rf_score_individual_input=["NOT CALCULATED"]
             for i in range(X_input_train_n.shape[1]):
                 X_temp_input=X_input_train_n[:,i]
                 X_temp_input=np.reshape(X_temp_input, (X_input_train_n.shape[0],1))

@@ -201,41 +201,42 @@ def encode(args):
         
         #subsampling by 4 
         data_2_subs=X_Train
+        data_2_subs_t=X_Test
         '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
         for i in range(0, data_train.shape[0]):
             for j in range(0, data_train.shape[1]):
                 data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
 
         #data_2_subs.shape
+        if(args.preprocess==1):
         
-        
-        for j in range(0, X_Train.shape[0]):
-            car=np.zeros((data_2_subs.shape[2],))
-            for i in range(0, X_Train.shape[1]):
-                car= car + data_2_subs[j,i,:]
-            car=car/X_Train.shape[1]
-            #car.shape
-            for k in range(0, X_Train.shape[1]):
-                data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-                    
-        #subsampling by 4 
-        data_2_subs_t=X_Test
-        '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-        for i in range(0, data_test.shape[0]):
-            for j in range(0, data_test.shape[1]):
-                data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+            for j in range(0, X_Train.shape[0]):
+                car=np.zeros((data_2_subs.shape[2],))
+                for i in range(0, X_Train.shape[1]):
+                    car= car + data_2_subs[j,i,:]
+                car=car/X_Train.shape[1]
+                #car.shape
+                for k in range(0, X_Train.shape[1]):
+                    data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+                        
+            #subsampling by 4 
+            
+            '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+            for i in range(0, data_test.shape[0]):
+                for j in range(0, data_test.shape[1]):
+                    data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
 
-        #data_2_subs_t.shape
-        #Common Average Reference
-        #if(c_ref==True):
-        for j in range(0, data_2_subs_t.shape[0]):
-            car=np.zeros((data_2_subs_t.shape[2],))
-            for i in range(0, data_2_subs_t.shape[1]):
-                car= car + data_2_subs_t[j,i,:]
-            car=car/data_2_subs_t.shape[1]
-            #car.shape
-            for k in range(0, data_2_subs_t.shape[1]):
-                data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+            #data_2_subs_t.shape
+            #Common Average Reference
+            #if(c_ref==True):
+            for j in range(0, data_2_subs_t.shape[0]):
+                car=np.zeros((data_2_subs_t.shape[2],))
+                for i in range(0, data_2_subs_t.shape[1]):
+                    car= car + data_2_subs_t[j,i,:]
+                car=car/data_2_subs_t.shape[1]
+                #car.shape
+                for k in range(0, data_2_subs_t.shape[1]):
+                    data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
             #Standard Scaler
 
@@ -250,7 +251,7 @@ def encode(args):
                 
 
                 
-        if(args.preprocess==1):
+        
             #scaler = StandardScaler()
             #param_ls=[]
             mu_l={}

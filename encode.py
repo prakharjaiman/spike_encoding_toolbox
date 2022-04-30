@@ -182,9 +182,9 @@ def encode(args):
         X_Test = data['X_Test']
         Y_Test = data['Y_Test']
 
-        X_Train_list.append(X_Train)
+        #X_Train_list.append(X_Train)
         Y_Train_list.append(Y_Train)
-        X_Test_list.append(X_Test)
+        #X_Test_list.append(X_Test)
         Y_Test_list.append(Y_Test)
 
 
@@ -262,8 +262,10 @@ def encode(args):
         # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
         # makes it incompatible in some cases where uniform input is desired.
         data_2_subs = np.moveaxis(data_2_subs, 2, 1)
+        X_Train_list.append(data_2_subs)
         #Shape now is (278, 3000, 64)
         data_2_subs_t = np.moveaxis(data_2_subs_t, 2, 1)
+        X_Test_list.append(data_2_subs_t)
         #nb_trials = X_Train.shape[0]
 
             
@@ -383,7 +385,7 @@ def encode(args):
             spike_times_test_up=spike_times_test_up,
             spike_times_test_dn=spike_times_test_dn,
         )
-        return spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
+        return nb_channels,spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
 
     else:
         #Add data here
@@ -403,15 +405,16 @@ def encode(args):
             Y_Tr = Y_Train[train_index]
             X_Test = X_Train[test_index]
             Y_Test = Y_Train[test_index]
-            X_Train_list.append(X_Tr)
+            #X_Train_list.append(X_Tr)
             Y_Train_list.append(Y_Tr)
-            X_Test_list.append(X_Test)
+            #X_Test_list.append(X_Test)
             Y_Test_list.append(Y_Test)
 
 
-
+            data_2_subs=X_Tr
+            data_2_subs_t=X_Test
             if(args.preprocess==1):
-                data_2_subs=X_Tr
+                
                 '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
                 for i in range(0, data_train.shape[0]):
                     for j in range(0, data_train.shape[1]):
@@ -428,7 +431,7 @@ def encode(args):
                         data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
                             
                 #subsampling by 4 
-                data_2_subs_t=X_Test
+                
                 '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
                 for i in range(0, data_test.shape[0]):
                     for j in range(0, data_test.shape[1]):
@@ -450,49 +453,29 @@ def encode(args):
 
                 #Standard Scaler
 
-                '''for j in range(0, data_train.shape[0]):
+                for j in range(0, data_2_subs.shape[0]):
                     kr=data_2_subs[j,:,:]
                     kr=data_2_subs[j,:,:]
                     
                     scaler=StandardScaler().fit(kr.T)
-                    data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+                    data_2_subs[j,:,:]=scaler.transform(kr.T).T
                     
 
+                for j in range(0, data_2_subs_t.shape[0]):
+                    kr=data_2_subs_t[j,:,:]
+                    kr=data_2_subs_t[j,:,:]
                     
-                    
-                #scaler = StandardScaler()
-                #param_ls=[]
-                mu_l={}
-                std_l={}
-                for j in range(data_2_subs.shape[1]):
-                    mu_l[str(j)]=[]
-                    std_l[str(j)]=[]
-                    
-                for i in range(data_2_subs.shape[0]):
-                    for j in range(data_2_subs.shape[1]):
-                        mu=np.mean(data_2_subs[i,j,:])
-                        std=np.std(data_2_subs[i,j,:])
-                        mu_l[str(j)].append(mu)
-                        std_l[str(j)].append(std)
-                
-                for j in range(data_2_subs.shape[1]):
-                    mu_l[str(j)]=sum(mu_l[str(j)])/len(mu_l[str(j)])
-                    std_l[str(j)]=sum(std_l[str(j)])/len(std_l[str(j)])
-                    
-                for i in range(data_2_subs.shape[0]):
-                    for j in range(data_2_subs.shape[1]):
-                        data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
-                    
-                for i in range(data_2_subs_t.shape[0]):
-                    for j in range(data_2_subs_t.shape[1]):
-                        data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
+                    scaler=StandardScaler().fit(kr.T)
+                    data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
 
 
 
             # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
             # makes it incompatible in some cases where uniform input is desired.
-            X_Tr = np.moveaxis(X_Tr, 2, 1)
-            X_Test = np.moveaxis(X_Test, 2, 1)
+            X_Tr = np.moveaxis(data_2_subs, 2, 1)
+            X_Test = np.moveaxis(data_2_subs_t, 2, 1)
+            X_Train_list.append(X_Tr)
+            X_Test_list.append(X_Test)
             nb_trials = X_Tr.shape[0]
 
                 
@@ -510,26 +493,41 @@ def encode(args):
             refractory_period = args.encode_refractory  # in ms
             th_up = args.encode_thr_up
             th_dn = args.encode_thr_dn
+            f_split=args.f_split
+            #no. of parts that the 3000 segment would be split in. For eg: if f_split=2 then parts is 0,1500 ; 1500,3000
+            parts=data_2_subs.shape[1]/f_split
+            #make a list that stores the partitioned array. For eg: X_Train_s[0].shape:(278,1500,64)
+            X_Train_s=[]
+            X_Test_s=[]
+            for h in range(f_split):
+                X_Train_s.append(data_2_subs[:,h*int(parts):(h+1)*int(parts),:])
+                X_Test_s.append(data_2_subs_t[:,h*int(parts):(h+1)*int(parts),:])
 
 
             # Generate the  data
-            X=X_Tr
-            Y=Y_Tr
-            spike_times_train_up = []
-            spike_times_train_dn = []
-            for i in range(len(X)):
-                spk_up, spk_dn = gen_spike_time(
-                    time_series_data=X[i],
-                    interpfact=interpfact,
-                    fs=fs,
-                    th_up=th_up,
-                    th_dn=th_dn,
-                    refractory_period=refractory_period,
-                )
-                spike_times_train_up.append(spk_up)
-                spike_times_train_dn.append(spk_dn)
-            spike_times_train_up_list.append(spike_times_train_up)
-            spike_times_train_dn_list.append(spike_times_train_dn)
+            spike_times_train_up_l=[]
+            spike_times_train_dn_l=[]
+            # Generate the  data
+            for h in range(f_split):
+                X=X_Train_s[h]
+                Y=Y_Train
+                spike_times_train_up = []
+                spike_times_train_dn = []
+                for i in range(len(X)):
+                    spk_up, spk_dn = gen_spike_time(
+                        time_series_data=X[i],
+                        interpfact=interpfact,
+                        fs=fs,
+                        th_up=th_up,
+                        th_dn=th_dn,
+                        refractory_period=refractory_period,
+                    )
+                    spike_times_train_up.append(spk_up)
+                    spike_times_train_dn.append(spk_dn)
+                spike_times_train_up_l.append(spike_times_train_up)
+                spike_times_train_dn_l.append(spike_times_train_dn)
+            spike_times_train_up_list.append(spike_times_train_up_l)
+            spike_times_train_dn_list.append(spike_times_train_dn_l)
 
             rate_up = gen_spike_rate(spike_times_train_up)
             rate_dn = gen_spike_rate(spike_times_train_dn)
@@ -539,24 +537,28 @@ def encode(args):
             avg_spike_rate_list.append(avg_spike_rate)
 
                 # Generate the  data
-            X=X_Test
-            Y=Y_Test
-            spike_times_test_up = []
-            spike_times_test_dn = []
-            for i in range(len(X)):
-                spk_up, spk_dn = gen_spike_time(
-                    time_series_data=X[i],
-                    interpfact=interpfact,
-                    fs=fs,
-                    th_up=th_up,
-                    th_dn=th_dn,
-                    refractory_period=refractory_period,
-                )
-                spike_times_test_up.append(spk_up)
-                spike_times_test_dn.append(spk_dn)
-            spike_times_test_up_list.append(spike_times_test_up)
-            spike_times_test_dn_list.append(spike_times_test_dn)
-
+            spike_times_test_up_l=[]
+            spike_times_test_dn_l=[]
+            for h in range(f_split):
+                X=X_Test_s[h]
+                Y=Y_Test
+                spike_times_test_up = []
+                spike_times_test_dn = []
+                for i in range(len(X)):
+                    spk_up, spk_dn = gen_spike_time(
+                        time_series_data=X[i],
+                        interpfact=interpfact,
+                        fs=fs,
+                        th_up=th_up,
+                        th_dn=th_dn,
+                        refractory_period=refractory_period,
+                    )
+                    spike_times_test_up.append(spk_up)
+                    spike_times_test_dn.append(spk_dn)
+                spike_times_test_up_l.append(spike_times_test_up)
+                spike_times_test_dn_l.append(spike_times_test_dn)
+            spike_times_test_up_list.append(spike_times_test_up_l)
+            spike_times_test_dn_list.append(spike_times_test_dn_l)
 
 
             nb_trials = X_Test.shape[0]
@@ -591,7 +593,7 @@ def encode(args):
                 spike_times_test_up=spike_times_test_up,
                 spike_times_test_dn=spike_times_test_dn,
             )
-        return spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
+        return nb_channels,spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
 
 
 if __name__ == '__main__':

@@ -116,7 +116,7 @@ def args():
                     help='calculate individual electrode score'
                           'e.g. 1, 2, 3 ')
     
-    parser.add_argument('--modes', default=["genetic","individual"], type=list,
+    parser.add_argument('--modes', default=[], type=list,
                     help='modes to calculate'
                           'e.g. ["genetic"]')
 

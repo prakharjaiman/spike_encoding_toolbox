@@ -102,6 +102,10 @@ def args():
     parser.add_argument('--fold', default=3, type=float,
                         help='Fold for train/test'
                              'e.g. 1, 2, 3 ')
+    
+    parser.add_argument('--population', default=300, type=int,
+                        help='population size for genetic search'
+                             'e.g. 100, 200, 300 ')
 
     parser.add_argument('--gen', default=2, type=int,
                     help='Fold for train/test'

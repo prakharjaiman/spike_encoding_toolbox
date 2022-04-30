@@ -37,7 +37,7 @@ if __name__ == '__main__':
     ,scaler=["Standard"]
     , calc_individual=[0]
 	  ,f_split=[3]
-	  ,modes=[[],["genetic"]]
+	  ,modes=[[],["genetic"],["individual"]
     )
   param_values = [v for v in parameters.values()] 
   for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler,args.calc_individual,args.f_split,args.modes in product(*param_values):

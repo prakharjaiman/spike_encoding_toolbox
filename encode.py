@@ -242,43 +242,21 @@ def encode(args):
 
             #Standard Scaler
 
-            '''for j in range(0, data_train.shape[0]):
+            for j in range(0, data_2_subs.shape[0]):
                 kr=data_2_subs[j,:,:]
                 kr=data_2_subs[j,:,:]
                 
                 scaler=StandardScaler().fit(kr.T)
-                data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+                data_2_subs[j,:,:]=scaler.transform(kr.T).T
                 
-
+            for j in range(0, data_2_subs_t.shape[0]):
+                kr=data_2_subs_t[j,:,:]
+                kr=data_2_subs_t[j,:,:]
                 
-        
-            #scaler = StandardScaler()
-            #param_ls=[]
-            mu_l={}
-            std_l={}
-            for j in range(data_2_subs.shape[1]):
-                mu_l[str(j)]=[]
-                std_l[str(j)]=[]
+                scaler=StandardScaler().fit(kr.T)
+                data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
                 
-            for i in range(data_2_subs.shape[0]):
-                for j in range(data_2_subs.shape[1]):
-                    mu=np.mean(data_2_subs[i,j,:])
-                    std=np.std(data_2_subs[i,j,:])
-                    mu_l[str(j)].append(mu)
-                    std_l[str(j)].append(std)
             
-            for j in range(data_2_subs.shape[1]):
-                mu_l[str(j)]=sum(mu_l[str(j)])/len(mu_l[str(j)])
-                std_l[str(j)]=sum(std_l[str(j)])/len(std_l[str(j)])
-                
-            for i in range(data_2_subs.shape[0]):
-                for j in range(data_2_subs.shape[1]):
-                    data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
-                
-            for i in range(data_2_subs_t.shape[0]):
-                for j in range(data_2_subs_t.shape[1]):
-                    data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
-
 
 
         # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which

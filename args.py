@@ -107,10 +107,21 @@ def args():
                         help='population size for genetic search'
                              'e.g. 100, 200, 300 ')
 
-    parser.add_argument('--gen', default=2, type=int,
-                    help='Fold for train/test'
+    parser.add_argument('--bank', default=8, type=int,
+                    help='filter bank'
                           'e.g. 1, 2, 3 ')
     
+    parser.add_argument('--bank_start', default=0, type=int,
+                    help='filter bank start freq'
+                          'e.g. 1, 2, 3 ')
+    
+    parser.add_argument('--bank_stop', default=200, type=int,
+                    help='filter bank stop freq'
+                          'e.g. 1, 2, 3 ')
+    
+    parser.add_argument('--fold', default=3, type=float,
+                        help='Fold for train/test'
+                             'e.g. 1, 2, 3 ')
     
     parser.add_argument('--f_split', default=2, type=int,
                     help='Splitting for concatenation of features'

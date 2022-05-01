@@ -118,10 +118,7 @@ def args():
     parser.add_argument('--bank_stop', default=200, type=int,
                     help='filter bank stop freq'
                           'e.g. 1, 2, 3 ')
-    
-    parser.add_argument('--fold', default=3, type=float,
-                        help='Fold for train/test'
-                             'e.g. 1, 2, 3 ')
+   
     
     parser.add_argument('--f_split', default=2, type=int,
                     help='Splitting for concatenation of features'

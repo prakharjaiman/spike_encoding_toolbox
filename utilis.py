@@ -9,7 +9,7 @@ import seaborn as sns
 import time
 from sklearn.ensemble import RandomForestClassifier
 import scikitplot as skplt
-
+from scipy.signal import butter, lfilter
 
 def convert_data_add_format(spike_time_array_1, spike_time_array_2):
     '''

@@ -368,3 +368,12 @@ def create_teacher_spike_train_inh(true_label, length_ms, period_ms, inh_factor)
             iter_flag += 1
     return time_array, index_array
 
+def bandpassfun (start, stop, nbbanks):
+    bank_array=[]
+    k=int((stop-start)/nbbanks)
+    i=int(start/k)
+    while(i*k<stop):
+        bank_array.append([i*int((stop-start)/nbbanks),(i+1)*int((stop-start)/nbbanks)])
+        i+=1
+    return bank_array
+

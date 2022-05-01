@@ -259,8 +259,8 @@ def encode(args):
         nbbanks=args.bank
         start=args.bank_start
         stop=args.bank_stop
-        X_Train_bandpass = np.ones(data_2_subs.shape[0],data_2_subs.shape[1]*nbbanks,data_2_subs.shape[2])
-        X_Test_bandpass = np.ones(data_2_subs_t.shape[0],data_2_subs_t.shape[1]*nbbanks,data_2_subs_t.shape[2])
+        X_Train_bandpass = np.ones((data_2_subs.shape[0],data_2_subs.shape[1]*nbbanks,data_2_subs.shape[2]))
+        X_Test_bandpass = np.ones((data_2_subs_t.shape[0],data_2_subs_t.shape[1]*nbbanks,data_2_subs_t.shape[2]))
         bank_array=bandpassfun(start, stop, nbbanks)
 
         for trial in range(data_2_subs.shape[0]):

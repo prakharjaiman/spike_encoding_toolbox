@@ -21,7 +21,7 @@ if __name__ == '__main__':
   seed = 50
   random.seed(seed)
   np.random.seed(seed)
-  df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"maxft":[],"f_split":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[],"gen_accuracy":[],"selected_features":[],"genetic_final_accuracy":[],"n_selected_features":[], "individual_rf":[], "niter":[],"preprocess":[],"scaler":[]})
+  df = pd.DataFrame({	"dataset":[],"encode_thr_up":[],"encode_thr_dn":[],"tstep":[],"maxft":[],"f_split":[],"encode_refractory":[],"encode_interpfact":[],"firing_rate":[],"svm_score":[],"rf_score":[],"svm_score_baseline":[],"svm_score_comb":[],"rf_score_comb":[],"gen_accuracy":[],"selected_features":[],"genetic_final_accuracy":[],"n_selected_features":[], "individual_rf":[], "niter":[],"preprocess":[],"scaler":[],"nbbanks":[],"start":[],"stop":[]})
 
   parameters = dict(
 		dataset = ["bci3"]
@@ -38,9 +38,12 @@ if __name__ == '__main__':
     , calc_individual=[0]
 	  ,f_split=[3]
 	  ,modes=[["svm_sc","rf_sc","svm_comb","rf_comb"],["genetic"],["individual"]]
+	  ,nbbanks=[8]
+	  ,stop=[200]
+	  ,start=[0]
     )
   param_values = [v for v in parameters.values()] 
-  for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler,args.calc_individual,args.f_split,args.modes in product(*param_values):
+  for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler,args.calc_individual,args.f_split,args.modes,args.nbbanks,args.stop,args.start in product(*param_values):
     args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
     svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb,acc,sel,gen,nfeat,rf_score_individual_input = evaluate_encoder(args)
     #for n in range(args.gen+1):
@@ -66,7 +69,10 @@ if __name__ == '__main__':
             "individual_rf":rf_score_individual_input,
             "niter":args.niter,
             "preprocess":args.preprocess,
-            "scaler":args.scaler
+            "scaler":args.scaler,
+		    "nbbanks":args.nbbanks,
+		    "start":args.start,
+		    "stop":args.stop
                     },ignore_index=True)
 
 

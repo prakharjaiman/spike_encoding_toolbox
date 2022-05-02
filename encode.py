@@ -268,14 +268,14 @@ def encode(args):
                 signal_raw = data_2_subs[trial][electrode]
                 for bank in range(nbbanks):
                     filtered_signal = butter_bandpass_filter(signal_raw, bank_array[bank][0], bank_array[bank][1],fs,order=2)
-                    X_Train_bandpass[[trial][(electrode*nbbanks)+bank]] = filtered_signal
+                    X_Train_bandpass[trial,((electrode*nbbanks)+bank),:]] = filtered_signal
 
         for trial in range(data_2_subs_t.shape[0]):
             for electrode in range(data_2_subs_t.shape[1]):
                 signal_raw = data_2_subs_t[trial][electrode]
                 for bank in range(nbbanks):
                     filtered_signal = butter_bandpass_filter(signal_raw, bank_array[bank][0], bank_array[bank][1],fs,order=2)
-                    X_Test_bandpass[[trial][(electrode*nbbanks)+bank]] = filtered_signal
+                    X_Test_bandpass[trial,((electrode*nbbanks)+bank),:]] = filtered_signal
 
         data_2_subs=X_Train_bandpass
         data_2_subs_t=X_Test_bandpass

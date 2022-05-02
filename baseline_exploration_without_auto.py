@@ -43,7 +43,7 @@ if __name__ == '__main__':
 	  ,start=[0]
     )
   param_values = [v for v in parameters.values()] 
-  for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler,args.calc_individual,args.f_split,args.modes,args.nbbanks,args.stop,args.start in product(*param_values):
+  for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler,args.calc_individual,args.f_split,args.modes,args.bank,args.bank_stop,args.bank_start in product(*param_values):
     args.experiment_name = str(args.dataset)+str(args.encode_thr_up)+str(args.encode_thr_dn)+str(args.encode_interpfact)+str(args.encode_refractory)
     svm_score, rf_score, firing_rate, svm_score_baseline, svm_score_comb, rf_score_comb,acc,sel,gen,nfeat,rf_score_individual_input = evaluate_encoder(args)
     #for n in range(args.gen+1):

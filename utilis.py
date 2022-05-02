@@ -381,7 +381,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=7):
     nyq = 0.5 * fs
     low = lowcut / nyq
     high = highcut / nyq
-    b, a = butter(order, [lowcut, highcut],fs=fs, btype='band')
-    y = lfilter(b, a, data)
+    b, a = scipy.signal.butter(order, [lowcut, highcut], 'bandpass',analog=False)
+    y = scipy.signal.filtfilt(b, a, data,axis=0)
     return y
 

@@ -70,9 +70,9 @@ if __name__ == '__main__':
             "niter":args.niter,
             "preprocess":args.preprocess,
             "scaler":args.scaler,
-		    "nbbanks":args.nbbanks,
-		    "start":args.start,
-		    "stop":args.stop
+		    "nbbanks":args.bank,
+		    "start":args.bank_start,
+		    "stop":args.bank_stop
                     },ignore_index=True)
 
 

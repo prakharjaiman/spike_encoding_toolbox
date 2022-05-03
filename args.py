@@ -17,6 +17,7 @@ def args():
     parser.add_argument(
         "--dataset", default="bci3", type=str, help="Dataset(BCI3)"
     )
+
     parser.add_argument(
         "--encode_thr_up",
         default=0.5,
@@ -83,7 +84,7 @@ def args():
         "--preprocess",
         default=1,
         type=int,
-        help="Time point till which the simulation has to be run",
+        help="1 = Preprocessing has to be done, 0 = No Preprocessing",
     )
 
     parser.add_argument(
@@ -106,45 +107,28 @@ def args():
     parser.add_argument('--population', default=300, type=int,
                         help='population size for genetic search'
                              'e.g. 100, 200, 300 ')
-
-    parser.add_argument('--bank', default=8, type=int,
-                    help='filter bank'
-                          'e.g. 1, 2, 3 ')
-    
-    parser.add_argument('--bank_start', default=0, type=int,
-                    help='filter bank start freq'
-                          'e.g. 1, 2, 3 ')
-    
-    parser.add_argument('--bank_stop', default=200, type=int,
-                    help='filter bank stop freq'
-                          'e.g. 1, 2, 3 ')
-   
-    
+  
     parser.add_argument('--f_split', default=2, type=int,
-                    help='Splitting for concatenation of features'
-                          'e.g. 1, 2, 3 ')
-    
-    parser.add_argument('--calc_individual', default=0, type=int,
-                    help='calculate individual electrode score'
-                          'e.g. 1, 2, 3 ')
+                    help='Splitting of time points'
+                          'Use case: if 2, then 0-1500 and 1500-3000')
     
     parser.add_argument('--modes', default=[], type=list,
                     help='modes to calculate'
                           'e.g. ["genetic"]')
 
     parser.add_argument('--niter', default=100, type=int,
-                    help='Fold for train/test'
-                          'e.g. 1, 2, 3 ')
+                    help='Numner of iterations for random search'
+                          'e.g. 50, 100, 200 ')
 
     parser.add_argument('--scaler', default="Standard", type=str,
-                    help='Fold for train/test'
-                          'e.g. 1, 2, 3 ')
+                    help='Type to scaler to nomralise the data'
+                          'e.g. Standard, MinMax ')
     
     parser.add_argument("--kfold",default=3,type=int,
         help="number of folds in kfold",
     )
     parser.add_argument("--maxft",default=5,type=int,
-        help="upper limit on number of features to be taken",
+        help="upper limit on number of features taken in genetic search",
     )
 
     parser.add_argument('--log_file_path', default=None, 

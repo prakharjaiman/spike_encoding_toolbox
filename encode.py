@@ -33,7 +33,7 @@ def encode(args):
     
     VERBOSE = True
     pwd = os. getcwd()
-
+    # Selecting the directory of the datasets and the number of channels
     if args.dataset == "bci3":
         data_dir = pwd + "/dataset/bci3.npz"
         fs = 1000
@@ -176,149 +176,89 @@ def encode(args):
 
         data = np.load(data_dir)
         X_Train = data['X_Train']
-        #Shape of X_Train is (278, 64, 3000)
+        # Shape of X_Train is (278, 64, 3000)
         Y_Train = data['Y_Train']
 
         X_Test = data['X_Test']
+        # Shape of X_Test is (100, 64, 3000)
         Y_Test = data['Y_Test']
 
-        #X_Train_list.append(X_Train)
         Y_Train_list.append(Y_Train)
-        #X_Test_list.append(X_Test)
         Y_Test_list.append(Y_Test)
 
 
 
         X_Train = np.array(X_Train)
-
-        #X_Train = np.moveaxis(X_Train, 2, 1)
         Y_Train = np.array(Y_Train)
 
         X_Test = np.array(X_Test)
-        #X_Test = np.moveaxis(X_Test, 2, 1)
         Y_Test = np.array(Y_Test)
 
         
-        #subsampling by 4 
-        data_2_subs=X_Train
-        data_2_subs_t=X_Test
-        '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-        for i in range(0, data_train.shape[0]):
-            for j in range(0, data_train.shape[1]):
-                data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
+        training_data=X_Train
+        testing_data=X_Test
 
-        #data_2_subs.shape
         if(args.preprocess==1):
-        
+            # Common Average Referencing 
             for j in range(0, X_Train.shape[0]):
-                car=np.zeros((data_2_subs.shape[2],))
+                car=np.zeros((training_data.shape[2],))
                 for i in range(0, X_Train.shape[1]):
-                    car= car + data_2_subs[j,i,:]
+                    car= car + training_data[j,i,:]
                 car=car/X_Train.shape[1]
                 #car.shape
                 for k in range(0, X_Train.shape[1]):
-                    data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-                        
-            #subsampling by 4 
-            
-            '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-            for i in range(0, data_test.shape[0]):
-                for j in range(0, data_test.shape[1]):
-                    data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
-
-            #data_2_subs_t.shape
-            #Common Average Reference
-            #if(c_ref==True):
-            for j in range(0, data_2_subs_t.shape[0]):
-                car=np.zeros((data_2_subs_t.shape[2],))
-                for i in range(0, data_2_subs_t.shape[1]):
-                    car= car + data_2_subs_t[j,i,:]
-                car=car/data_2_subs_t.shape[1]
+                    training_data[j,k,:]=training_data[j,k,:]-car
+    
+            for j in range(0, testing_data.shape[0]):
+                car=np.zeros((testing_data.shape[2],))
+                for i in range(0, testing_data.shape[1]):
+                    car= car + testing_data[j,i,:]
+                car=car/testing_data.shape[1]
                 #car.shape
-                for k in range(0, data_2_subs_t.shape[1]):
-                    data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+                for k in range(0, testing_data.shape[1]):
+                    testing_data[j,k,:]=testing_data[j,k,:]-car
 
             #Standard Scaler
 
-            #Standard Scaler
-
-            for j in range(0, data_2_subs.shape[0]):
-                kr=data_2_subs[j,:,:]
-                kr=data_2_subs[j,:,:]
+            for j in range(0, training_data.shape[0]):
+                kr=training_data[j,:,:]
+                kr=training_data[j,:,:]
                 
                 scaler=StandardScaler().fit(kr.T)
-                data_2_subs[j,:,:]=scaler.transform(kr.T).T
+                training_data[j,:,:]=scaler.transform(kr.T).T
                 
-            for j in range(0, data_2_subs_t.shape[0]):
-                kr=data_2_subs_t[j,:,:]
-                kr=data_2_subs_t[j,:,:]
+            for j in range(0, testing_data.shape[0]):
+                kr=testing_data[j,:,:]
+                kr=testing_data[j,:,:]
                 
                 scaler=StandardScaler().fit(kr.T)
-                data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+                testing_data[j,:,:]=scaler.transform(kr.T).T
                 
-        nbbanks=args.bank
-        start=args.bank_start
-        stop=args.bank_stop
-        X_Train_bandpass = np.ones((data_2_subs.shape[0],data_2_subs.shape[1]*nbbanks,data_2_subs.shape[2]))
-        X_Test_bandpass = np.ones((data_2_subs_t.shape[0],data_2_subs_t.shape[1]*nbbanks,data_2_subs_t.shape[2]))
-        bank_array=bandpassfun(start, stop, nbbanks)
-        print(bank_array)
+        training_data = np.moveaxis(training_data, 2, 1)
+        X_Train_list.append(training_data)
 
-        for trial in range(data_2_subs.shape[0]):
-            for electrode in range(data_2_subs.shape[1]):
-                signal_raw = data_2_subs[trial][electrode]
-                for bank in range(nbbanks):
-                    filtered_signal = butter_bandpass_filter(signal_raw, bank_array[bank][0], bank_array[bank][1],fs,order=2)
-                    X_Train_bandpass[trial,((electrode*nbbanks)+bank),:] = filtered_signal
-
-        for trial in range(data_2_subs_t.shape[0]):
-            for electrode in range(data_2_subs_t.shape[1]):
-                signal_raw = data_2_subs_t[trial][electrode]
-                for bank in range(nbbanks):
-                    filtered_signal = butter_bandpass_filter(signal_raw, bank_array[bank][0], bank_array[bank][1],fs,order=2)
-                    X_Test_bandpass[trial,((electrode*nbbanks)+bank),:] = filtered_signal
-
-        data_2_subs=X_Train_bandpass
-        data_2_subs_t=X_Test_bandpass
-
-        # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
-        # makes it incompatible in some cases where uniform input is desired.
-        data_2_subs = np.moveaxis(data_2_subs, 2, 1)
-        X_Train_list.append(data_2_subs)
         #Shape now is (278, 3000, 64)
-        data_2_subs_t = np.moveaxis(data_2_subs_t, 2, 1)
-        X_Test_list.append(data_2_subs_t)
-        #nb_trials = X_Train.shape[0]
 
-            
-        # print(len(X))
-        print("Number of training samples in dataset:")
-        print(len(X_Train))
-        #len is 278
-        print(len(Y_Train))
-        # print("Class labels:")
-        # print(list(set(Y_Train)))
-
-        # Take session 0,1 as and session 2 as test.
-
+        testing_data = np.moveaxis(testing_data, 2, 1)
+        X_Test_list.append(testing_data)
 
         interpfact = args.encode_interpfact
         refractory_period = args.encode_refractory  # in ms
         th_up = args.encode_thr_up
         th_dn = args.encode_thr_dn
         f_split=args.f_split
-        #no. of parts that the 3000 segment would be split in. For eg: if f_split=2 then parts is 0,1500 ; 1500,3000
-        parts=data_2_subs.shape[1]/f_split
-        #make a list that stores the partitioned array. For eg: X_Train_s[0].shape:(278,1500,64)
+        # Number of parts that the 3000 segment would be split in. For eg: if f_split=2 then parts is 0,1500 ; 1500,3000
+        parts=training_data.shape[1]/f_split
+        # Make a list that stores the partitioned array. For eg: X_Train_s[0].shape:(278,1500,64)
         X_Train_s=[]
         X_Test_s=[]
         for h in range(f_split):
-            X_Train_s.append(data_2_subs[:,h*int(parts):(h+1)*int(parts),:])
-            X_Test_s.append(data_2_subs_t[:,h*int(parts):(h+1)*int(parts),:])
+            X_Train_s.append(training_data[:,h*int(parts):(h+1)*int(parts),:])
+            X_Test_s.append(testing_data[:,h*int(parts):(h+1)*int(parts),:])
 
         spike_times_train_up_l=[]
         spike_times_train_dn_l=[]
-        # Generate the  data
+        # Generate the data
         for h in range(f_split):
             X=X_Train_s[h]
             Y=Y_Train
@@ -341,7 +281,7 @@ def encode(args):
         spike_times_train_dn_list.append(spike_times_train_dn_l)
 
         
-        #ASK NIKHIL HERE
+        # Need to be looked upon in further iterations
         rate_up = gen_spike_rate(spike_times_train_up)
         rate_dn = gen_spike_rate(spike_times_train_dn)
         avg_spike_rate = (rate_up+rate_dn)/2
@@ -372,11 +312,6 @@ def encode(args):
         spike_times_test_up_list.append(spike_times_test_up_l)
         spike_times_test_dn_list.append(spike_times_test_dn_l)
         
-
-
-
-        nb_trials = X_Test.shape[0]
-
             
         # print(len(X))
         print("Number of test samples in dataset:")
@@ -398,20 +333,16 @@ def encode(args):
 
         np.savez_compressed(
             file_path + file_name,
-            # X_Train=X_Train,
             Y_Train=Y_Train,
-            # X_Test=X_Test,
             Y_Test=Y_Test,
             spike_times_train_up=spike_times_train_up,
             spike_times_train_dn=spike_times_train_dn,
             spike_times_test_up=spike_times_test_up,
             spike_times_test_dn=spike_times_test_dn,
         )
-        nb_channels=nb_channels*nbbanks
         return nb_channels,spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list
 
     else:
-        #Add data here
         X_Train = []
         Y_Train = []
         X_Test = []
@@ -421,96 +352,66 @@ def encode(args):
         X_Train = data['X']
         Y_Train = data['y']
 
+        # Splitting the data into k folds 
         kf3 = KFold(n_splits=args.kfold, shuffle=False)
-        
         for train_index, test_index in kf3.split(X_Train):
             X_Tr = X_Train[train_index]
             Y_Tr = Y_Train[train_index]
             X_Test = X_Train[test_index]
             Y_Test = Y_Train[test_index]
-            #X_Train_list.append(X_Tr)
+
+            # Storing the for K-Fold Cross Validation datasets
             Y_Train_list.append(Y_Tr)
-            #X_Test_list.append(X_Test)
             Y_Test_list.append(Y_Test)
 
 
-            data_2_subs=X_Tr
-            data_2_subs_t=X_Test
+            training_data=X_Tr
+            testing_data=X_Test
             if(args.preprocess==1):
                 
-                '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-                for i in range(0, data_train.shape[0]):
-                    for j in range(0, data_train.shape[1]):
-                        data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
 
-                #data_2_subs.shape
+                #training_data.shape
                 for j in range(0, X_Tr.shape[0]):
-                    car=np.zeros((data_2_subs.shape[2],))
+                    car=np.zeros((training_data.shape[2],))
                     for i in range(0, X_Tr.shape[1]):
-                        car= car + data_2_subs[j,i,:]
+                        car= car + training_data[j,i,:]
                     car=car/X_Tr.shape[1]
                     #car.shape
                     for k in range(0, X_Tr.shape[1]):
-                        data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-                            
-                #subsampling by 4 
+                        training_data[j,k,:]=training_data[j,k,:]-car
                 
-                '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-                for i in range(0, data_test.shape[0]):
-                    for j in range(0, data_test.shape[1]):
-                        data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
-
-                #data_2_subs_t.shape
-                #Common Average Reference
-                #if(c_ref==True):
-                for j in range(0, data_2_subs_t.shape[0]):
-                    car=np.zeros((data_2_subs_t.shape[2],))
-                    for i in range(0, data_2_subs_t.shape[1]):
-                        car= car + data_2_subs_t[j,i,:]
-                    car=car/data_2_subs_t.shape[1]
+                
+                for j in range(0, testing_data.shape[0]):
+                    car=np.zeros((testing_data.shape[2],))
+                    for i in range(0, testing_data.shape[1]):
+                        car= car + testing_data[j,i,:]
+                    car=car/testing_data.shape[1]
                     #car.shape
-                    for k in range(0, data_2_subs_t.shape[1]):
-                        data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
+                    for k in range(0, testing_data.shape[1]):
+                        testing_data[j,k,:]=testing_data[j,k,:]-car
 
                 #Standard Scaler
 
-                #Standard Scaler
-
-                for j in range(0, data_2_subs.shape[0]):
-                    kr=data_2_subs[j,:,:]
-                    kr=data_2_subs[j,:,:]
+                for j in range(0, training_data.shape[0]):
+                    kr=training_data[j,:,:]
+                    kr=training_data[j,:,:]
                     
                     scaler=StandardScaler().fit(kr.T)
-                    data_2_subs[j,:,:]=scaler.transform(kr.T).T
+                    training_data[j,:,:]=scaler.transform(kr.T).T
                     
 
-                for j in range(0, data_2_subs_t.shape[0]):
-                    kr=data_2_subs_t[j,:,:]
-                    kr=data_2_subs_t[j,:,:]
+                for j in range(0, testing_data.shape[0]):
+                    kr=testing_data[j,:,:]
+                    kr=testing_data[j,:,:]
                     
                     scaler=StandardScaler().fit(kr.T)
-                    data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
+                    testing_data[j,:,:]=scaler.transform(kr.T).T
 
 
-
-            # X_uniform is a time series data array with length of 400. The initial segments are about 397, 493 etc which
-            # makes it incompatible in some cases where uniform input is desired.
-            X_Tr = np.moveaxis(data_2_subs, 2, 1)
-            X_Test = np.moveaxis(data_2_subs_t, 2, 1)
+            X_Tr = np.moveaxis(training_data, 2, 1)
+            X_Test = np.moveaxis(testing_data, 2, 1)
             X_Train_list.append(X_Tr)
             X_Test_list.append(X_Test)
-            nb_trials = X_Tr.shape[0]
-
-                
-            # print(len(X))
-            print("Number of training samples in dataset:")
-            print(len(X_Tr))
-            print(len(Y_Tr))
-            # print("Class labels:")
-            # print(list(set(Y_Train)))
-
-            # Take session 0,1 as and session 2 as test.
-
 
             interpfact = args.encode_interpfact
             refractory_period = args.encode_refractory  # in ms
@@ -518,13 +419,13 @@ def encode(args):
             th_dn = args.encode_thr_dn
             f_split=args.f_split
             #no. of parts that the 3000 segment would be split in. For eg: if f_split=2 then parts is 0,1500 ; 1500,3000
-            parts=data_2_subs.shape[1]/f_split
+            parts=training_data.shape[1]/f_split
             #make a list that stores the partitioned array. For eg: X_Train_s[0].shape:(278,1500,64)
             X_Train_s=[]
             X_Test_s=[]
             for h in range(f_split):
-                X_Train_s.append(data_2_subs[:,h*int(parts):(h+1)*int(parts),:])
-                X_Test_s.append(data_2_subs_t[:,h*int(parts):(h+1)*int(parts),:])
+                X_Train_s.append(training_data[:,h*int(parts):(h+1)*int(parts),:])
+                X_Test_s.append(testing_data[:,h*int(parts):(h+1)*int(parts),:])
 
 
             # Generate the  data
@@ -555,8 +456,6 @@ def encode(args):
             rate_up = gen_spike_rate(spike_times_train_up)
             rate_dn = gen_spike_rate(spike_times_train_dn)
             avg_spike_rate = (rate_up+rate_dn)/2
-            print("Average spiking rate")
-            print(avg_spike_rate)
             avg_spike_rate_list.append(avg_spike_rate)
 
                 # Generate the  data
@@ -583,23 +482,10 @@ def encode(args):
             spike_times_test_up_list.append(spike_times_test_up_l)
             spike_times_test_dn_list.append(spike_times_test_dn_l)
 
-
-            nb_trials = X_Test.shape[0]
-
-                
-            # print(len(X))
-            print("Number of test samples in dataset:")
-            print(len(X_Test))
-            print(len(Y_Test))
-            # print("Class labels:")
-            # print(list(set(Y_Test)))
-
-
             spike_times_train_up = np.array(spike_times_train_up)
             spike_times_test_up = np.array(spike_times_test_up)
             spike_times_train_dn = np.array(spike_times_train_dn)
             spike_times_test_dn = np.array(spike_times_test_dn)
-
 
             file_path = "dataset/"
             file_name = args.encoded_data_file_prefix + str(args.dataset) + str(args.encode_thr_up) + str(
@@ -607,9 +493,7 @@ def encode(args):
 
             np.savez_compressed(
                 file_path + file_name,
-                # X_Train=X_Train,
                 Y_Train=Y_Tr,
-                # X_Test=X_Test,
                 Y_Test=Y_Test,
                 spike_times_train_up=spike_times_train_up,
                 spike_times_train_dn=spike_times_train_dn,

@@ -39,8 +39,6 @@ from sklearn import svm
 
 
 def evaluate_encoder(args):
-    #ASK NIKHIL HERE
-    #nbInputs = 64
     seed = 500
     random.seed(seed)
     np.random.seed(seed)
@@ -65,7 +63,7 @@ def evaluate_encoder(args):
         
 
         f_split=args.f_split
-        #Do an iteration for all of the f_split divides
+        #Does an iteration for all of the f_split divides
         for h in range(f_split):
             spike_rate_array_all_input_train = np.ones((nbInputs, nbtimepoints)) * -1 
             nbtimepoints = int(args.duration / args.tstep)
@@ -93,15 +91,10 @@ def evaluate_encoder(args):
 
             if h==0:
                 X_input_train_final=X_input_train
-                #X_input_test_final=X_input_test
             else:
                 X_input_train_final=np.hstack((X_input_train_final, X_input_train))
-                #X_input_test_final=np.hstack((X_input_test_final, X_input_test))
 
             #Assume shape of X_input_train to be (trials,X) -> (278, X)
-            print("Number of Train samples : ")
-            print(len(X_input_train))
-            print(X_input_train[0].shape)
 
             
         # Testing
@@ -109,14 +102,11 @@ def evaluate_encoder(args):
         spike_times_dn = spike_times_test_dn_list[0]
         labels = Y_Test_list[0]
         label_list = []
-        #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
         for h in range(f_split):
             spike_rate_array_all_input_test = np.ones((nbInputs, nbtimepoints)) * -1
             labels = Y_Test_list[0]
             label_list = []
             for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
-                #TODO: do a TQDM progress bar here
-                # print(iteration)
                 times, indices = convert_data_add_format(sample_time_up, sample_time_down)
 
                 rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
@@ -134,21 +124,11 @@ def evaluate_encoder(args):
 
             X_input_test=np.array(X_input_test)
             if h==0:
-                #X_input_train_final=X_input_train
                 X_input_test_final=X_input_test
             else:
-                #X_input_train_final=np.hstack((X_input_train_final, X_input_train))
                 X_input_test_final=np.hstack((X_input_test_final, X_input_test))
             
-            
-
-            
-
-
-        print("Number of Test samples : ")
-        print(len(X_input_test))
-
-        #CHECK SEGMENTATION
+        #Ask Nikhil
         X_Train_segmented, Y_Train_segmented = segment(X_Train_list[0], Y_Train_list[0],tstep= args.tstep, tstart=0, tstop=args.tlast)
         print(len(X_Train_segmented))
         X_Train_segmented=np.array(X_Train_segmented)
@@ -161,10 +141,6 @@ def evaluate_encoder(args):
         Y_train = Y_Train_segmented
         Y_test = Y_Test_segmented
 
-
-        '''
-        Input model for evaluating spike rates features obtained from temporal difference encoding
-        '''
         
         n_iter=args.niter
         modes=args.modes
@@ -190,7 +166,6 @@ def evaluate_encoder(args):
             rf = RandomForestClassifier()
             distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
             clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
-            #print("THESHAPE OF X_input_train"+len(X_input_train))
             clf.fit(X_input_train_final, Y_input_train)
             prediction = clf.predict(X_input_test_final)
             rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
@@ -234,14 +209,12 @@ def evaluate_encoder(args):
 
 
 
-        print("THIS")
         X_input_train_n = np.array(X_input_train_final)
         for i in range(0,len(X_input_train_final)):
             if i==0:
                 X_input_train_n=X_input_train_final[0]
             else:
                 X_input_train_n=np.vstack((X_input_train_n, X_input_train_final[i]))
-        print(X_input_train_n.shape)
         
         X_input_test_n = np.array(X_input_test_final)
         for i in range(0,len(X_input_test_final)):
@@ -298,27 +271,6 @@ def evaluate_encoder(args):
         else:
             rf_score_individual_input_list=["NOT CALCULATED"]
             
-            '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
-            cls_auto.fit(X_input_train_comb, Y_input_train)
-            predictions = cls_auto.predict(X_input_test_comb)
-            from sklearn import metrics
-            auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
-
-
-            '''pwd = os.getcwd()
-            plot_dir = pwd + '/plots/'
-            plt.rcParams.update({'font.size': 16})
-            #Confusion matrix
-            predictions = clf_input.predict(X_input_test)
-            ax = skplt.metrics.plot_confusion_matrix(Y_input_test, predictions, normalize=True)
-            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'confusion'+'.svg')
-            plt.clf()
-            #ROC curve
-            predicted_probas = clf_input.predict_proba(X_input_test)
-            ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
-            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
-            plt.clf()'''
-
 
         '''
         Baseline model for evaluating time domain averaged features obtained from raw signals
@@ -337,25 +289,6 @@ def evaluate_encoder(args):
         
 
 
-
-        
-
-
-        #Confusion matrix
-        '''predictions = clf_baseline.predict(X_test)
-        ax = skplt.metrics.plot_confusion_matrix(Y_test, predictions, normalize=True)
-        plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'confusion'+'.svg')
-        plt.clf()
-        #ROC curve
-        predicted_probas = clf_baseline.predict_proba(X_test)
-        ax2 = skplt.metrics.plot_roc(Y_test, predicted_probas)
-        plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'roc'+'.svg')
-        plt.clf()'''
-        
-        
-
-        #plot_dataset(X=X_test,y=Y_test,fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_raw_test',args=args)
-        #plot_dataset(X=np.array(X_input_test),y=np.array(Y_input_test),fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_decoded_test',args=args)
         np.savez_compressed(
             'spike_data.npz',
             X=np.array(X_input_test),
@@ -366,7 +299,7 @@ def evaluate_encoder(args):
         return svm_score_input,rf_score_input,avg_spike_rate_list, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat, rf_score_individual_input_list# auto_score
 
     else:
-        #spike_times_train_up, spike_times_train_dn, spike_times_test_up, spike_times_test_dn, X_Train,X_Test, Y_Train,Y_Test,avg_spike_rate = encode(args)
+        
         for k in range(args.kfold):
             nbtimepoints = int(args.duration / args.tstep)
 
@@ -407,27 +340,20 @@ def evaluate_encoder(args):
 
                 if h==0:
                     X_input_train_final=X_input_train
-                    #X_input_test_final=X_input_test
                 else:
                     X_input_train_final=np.hstack((X_input_train_final, X_input_train))
-                    #X_input_test_final=np.hstack((X_input_test_final, X_input_test))
-            print("Number of Train samples : ")
-            print(len(X_input_train))
-
+        
             
             # Testing
             spike_times_up = spike_times_test_up_list[k]
             spike_times_dn = spike_times_test_dn_list[k]
             labels = Y_Test_list[k]
             label_list = []
-            #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
             for h in range(f_split):
                 spike_rate_array_all_input_test = np.ones((nbInputs, nbtimepoints)) * -1
                 labels = Y_Test_list[k]
                 label_list = []
                 for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up[h], spike_times_dn[h])):
-                    #TODO: do a TQDM progress bar here
-                    # print(iteration)
                     times, indices = convert_data_add_format(sample_time_up, sample_time_down)
 
                     rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
@@ -445,15 +371,10 @@ def evaluate_encoder(args):
 
                 X_input_test=np.array(X_input_test)
                 if h==0:
-                    #X_input_train_final=X_input_train
                     X_input_test_final=X_input_test
                 else:
-                    #X_input_train_final=np.hstack((X_input_train_final, X_input_train))
                     X_input_test_final=np.hstack((X_input_test_final, X_input_test))
             
-            print("Number of Test samples : ")
-            print(len(X_input_test))
-
 
             X_Train_segmented, Y_Train_segmented = segment(X_Train_list[k], Y_Train_list[k],tstep= args.tstep, tstart=0, tstop=args.tlast)
             print(len(X_Train_segmented))
@@ -484,18 +405,11 @@ def evaluate_encoder(args):
                 svm_score_input_list.append(svm_score_input)
             else:
                 svm_score_input_list="Not calculated"
-            print("ONEODNE")
-
-
-            print("Input test accuraccy")
-            print(svm_score_input)
-
             word="rf_sc"
             if word in modes:
                 rf = RandomForestClassifier()
                 distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
-                #print("THESHAPE OF X_input_train"+len(X_input_train))
                 clf.fit(X_input_train_final, Y_input_train)
                 prediction = clf.predict(X_input_test_final)
                 rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
@@ -541,7 +455,6 @@ def evaluate_encoder(args):
             else:
                 acc_list, sel_list, gen_list, nfeat_list=["Not calculated","Not calculated","Not calculated","Not calculated"]
 
-            print("THIS")
             X_input_train_n = np.array(X_input_train_final)
             for i in range(0,len(X_input_train_final)):
                 if i==0:
@@ -605,27 +518,6 @@ def evaluate_encoder(args):
                 rf_score_individual_input_list=["NOT CALCULATED"]
 
             
-            '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
-            cls_auto.fit(X_input_train_comb, Y_input_train)
-            predictions = cls_auto.predict(X_input_test_comb)
-            from sklearn import metrics
-            auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
-
-
-            '''pwd = os.getcwd()
-            plot_dir = pwd + '/plots/'
-            plt.rcParams.update({'font.size': 16})
-            #Confusion matrix
-            predictions = clf_input.predict(X_input_test)
-            ax = skplt.metrics.plot_confusion_matrix(Y_input_test, predictions, normalize=True)
-            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'confusion'+'.svg')
-            plt.clf()
-            #ROC curve
-            predicted_probas = clf_input.predict_proba(X_input_test)
-            ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
-            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
-            plt.clf()'''
-
 
             '''
             Baseline model for evaluating time domain averaged features obtained from raw signals
@@ -643,22 +535,6 @@ def evaluate_encoder(args):
 
             
 
-
-            #Confusion matrix
-            '''predictions = clf_baseline.predict(X_test)
-            ax = skplt.metrics.plot_confusion_matrix(Y_test, predictions, normalize=True)
-            plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'confusion'+'.svg')
-            plt.clf()
-            #ROC curve
-            predicted_probas = clf_baseline.predict_proba(X_test)
-            ax2 = skplt.metrics.plot_roc(Y_test, predicted_probas)
-            plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'roc'+'.svg')
-            plt.clf()'''
-            
-            
-
-            #plot_dataset(X=X_test,y=Y_test,fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_raw_test',args=args)
-            #plot_dataset(X=np.array(X_input_test),y=np.array(Y_input_test),fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_decoded_test',args=args)
             np.savez_compressed(
                 'spike_data.npz',
                 X=np.array(X_input_test),

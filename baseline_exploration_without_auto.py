@@ -38,9 +38,9 @@ if __name__ == '__main__':
     , calc_individual=[0]
 	  ,f_split=[3]
 	  ,modes=[["svm_sc","rf_sc","svm_comb","rf_comb"],["genetic"],["individual"]]
-	  ,nbbanks=[8]
-	  ,stop=[200]
-	  ,start=[0]
+	  ,nbbanks=[2]
+	  ,stop=[100]
+	  ,start=[20]
     )
   param_values = [v for v in parameters.values()] 
   for args.dataset,args.encode_thr_up,args.encode_thr_dn, args.tstep, args.encode_interpfact,args.encode_refractory, args.gen,args.maxft,args.preprocess,args.niter,args.scaler,args.calc_individual,args.f_split,args.modes,args.bank,args.bank_stop,args.bank_start in product(*param_values):

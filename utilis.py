@@ -372,8 +372,8 @@ def bandpassfun (start, stop, nbbanks):
     bank_array=[]
     k=int((stop-start)/nbbanks)
     i=int(start/k)
-    while(i*k<stop):
-        bank_array.append([i*int((stop-start)/nbbanks),(i+1)*int((stop-start)/nbbanks)])
+    while((i+1)*k<stop):
+        bank_array.append([start+i*k,start+(i+1)*k])
         i+=1
     return bank_array
 
@@ -381,7 +381,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=7):
     nyq = 0.5 * fs
     low = lowcut / nyq
     high = highcut / nyq
-    b, a = scipy.signal.butter(order, [lowcut, highcut], 'bandpass',analog=False)
-    y = scipy.signal.filtfilt(b, a, data,axis=0)
+    b, a = sc.signal.butter(order, [low, high], 'bandpass',analog=False)
+    y = sc.signal.filtfilt(b, a, data,axis=0)
     return y
 
